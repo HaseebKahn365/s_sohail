@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sort_child_properties_last
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sort_child_properties_last, must_be_immutable
 
 // Introduction:
 // This is a simple flutter application that is primarily designed for reading and writing data to a local database for persistent storage. The purpose is to take the data related to the patient and store it on a relational database using the SQflite package available as a package for flutter.
@@ -115,11 +115,11 @@ class HomeScreen extends StatefulWidget {
 
   List<Patient> patientList = [
     Patient(
-      name: 'John Doe',
+      name: 'Abdul Haseeb',
       admittedOn: DateTime.now(),
     ),
     Patient(
-      name: 'Jane Doe',
+      name: 'Muhammad Bilal',
       admittedOn: DateTime.now(),
     ),
   ];
@@ -145,34 +145,38 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       //creating a simple drawer for theme setting and about me page
       drawer: Drawer(
+        elevation: 0,
         child: ListView(
-          padding: EdgeInsets.zero,
+          // increase the height of the drawer header
           children: <Widget>[
-            DrawerHeader(
-              child: Column(
-                children: [
-                  //circle avatar for the profile picture
-                  CircleAvatar(
-                    radius: 40,
-                    //assets/images/profile.png
-                    backgroundImage: AssetImage('assets/profile.png'),
-                  ),
-                  const Text(
-                    'Abdul Haseeb',
-                    style: TextStyle(
-                      fontSize: 20,
+            SizedBox(
+              height: 250,
+              child: DrawerHeader(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    //circle avatar for the profile picture
+                    CircleAvatar(
+                      radius: 65,
+                      backgroundImage: AssetImage('assets/profile.png'),
                     ),
-                  ),
-                  const Text(
-                    'S. Sohail Hospital',
-                    style: TextStyle(
-                      fontSize: 16,
+                    const Text(
+                      'Abdul Haseeb',
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onPrimary,
+                    const Text(
+                      'S. Sohail Hospital',
+                      style: TextStyle(
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
               ),
             ),
             ListTile(
@@ -221,6 +225,27 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 child: const Text('Add Patient'),
               ),
+
+              //list tiles for patients
+              ...widget.patientList.map((e) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+                  child: Card(
+                    child: ListTile(
+                      //rounded corners for the list tiles
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+
+                      title: Text(e.name),
+                      subtitle: Text("${e.admittedOn.day} / ${e.admittedOn.month} / ${e.admittedOn.year}  at ${e.admittedOn.hour}:${e.admittedOn.minute} ${e.admittedOn.hour > 12 ? 'PM' : 'AM'}"),
+                      onTap: () {
+                        // Add your onPressed code here!
+                      },
+                    ),
+                  ),
+                );
+              }).toList(),
             ],
           )
         ],
