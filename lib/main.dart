@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sort_child_properties_last
 
 // Introduction:
 // This is a simple flutter application that is primarily designed for reading and writing data to a local database for persistent storage. The purpose is to take the data related to the patient and store it on a relational database using the SQflite package available as a package for flutter.
@@ -149,27 +149,39 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              child: Text('Settings'),
+              child: Column(
+                children: [
+                  //circle avatar for the profile picture
+                  CircleAvatar(
+                    radius: 40,
+                    //assets/images/profile.png
+                    backgroundImage: AssetImage('assets/profile.png'),
+                  ),
+                  const Text(
+                    'Abdul Haseeb',
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  const Text(
+                    'S. Sohail Hospital',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
             ),
             ListTile(
-              title: const Text('Light Mode'),
-              onTap: () {
-                widget.handleBrightnessChange();
-              },
-            ),
-            ListTile(
               title: const Text('Dark Mode'),
+              trailing: Icon(
+                widget.useLightMode ? Icons.dark_mode : Icons.light_mode,
+              ),
               onTap: () {
                 widget.handleBrightnessChange();
-              },
-            ),
-            ListTile(
-              title: const Text('Material 3'),
-              onTap: () {
-                // Add your onPressed code here!
               },
             ),
             ListTile(
@@ -177,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
               trailing: Icon(Icons.info_outline),
               onTap: () {
                 // https://github.com/HaseebKahn365/s_sohail_hospital
-                launchUrl(Uri.parse('https://github.com/HaseebKahn365/s_sohail_hospital'));
+                launchUrl(Uri.parse('https://github.com/HaseebKahn365/s_sohail'));
               },
             ),
           ],
@@ -185,15 +197,13 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       appBar: AppBar(
+        //increase the size of the app bar
+        toolbarHeight: 85,
+        centerTitle: true,
         title: const Text('S. Sohail Hospital'),
         //adding an action to toggle the theme
         actions: <Widget>[
           //adding an exclamation icon button that launches the about me page
-
-          IconButton(
-            icon: Icon(widget.useLightMode ? Icons.dark_mode : Icons.light_mode),
-            onPressed: widget.handleBrightnessChange,
-          ),
         ],
       ),
       //List view for widgets
