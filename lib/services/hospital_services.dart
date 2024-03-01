@@ -75,7 +75,7 @@ class PatientService {
 
   Future<void> open() async {
     if (_db != null) {
-      throw 'Database already open';
+      return;
     }
     try {
       print("Creating new database for patients");

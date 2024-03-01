@@ -273,8 +273,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => PatientScreen(
-                              patient: e,
-                            ),
+                                // patient: e,
+                                ),
                           ),
                         );
                       },
@@ -294,10 +294,11 @@ class _HomeScreenState extends State<HomeScreen> {
             // Add your onPressed code here!
             // date should be string epoch value
             String tempnow = DateTime.now().millisecondsSinceEpoch.toString();
+            await patientService.open();
             DatabasePatient p1 = await patientService.createPatient(name: 'Abdul Haseeb', admittedOn: tempnow);
             //creating a doctor
             DatabaseDoctor d1 = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
-            // d1.createDoctor(name: 'Dr. dsfa', specialization: 'General Physician');
+            d1.createDoctor(name: 'Dr. dsfa', specialization: 'General Physician');
             //creating a visit
             DatabaseVisit v1 = DatabaseVisit(diagnosis: 'Fever', amount: 365, visitDate: tempnow, docId: d1.id, userId: p1.id, id: 1);
             v1.createVisit(diagnosis: 'Fever', amount: 365, visitDate: tempnow, docId: d1.id, userId: p1.id);

@@ -17,7 +17,7 @@ On tapping the pay Bills button an alert dialogue box shows up showing whether w
 
  */
 
-//this is a temporary class for patient
+// this is a temporary class for patient
 class Patient {
   String name;
   DateTime admittedOn;

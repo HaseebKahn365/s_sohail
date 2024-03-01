@@ -15,6 +15,11 @@ class HospitalSystem extends ChangeNotifier {
   List<DatabaseVisit> _visits = [];
   List<DatabaseDoctor> _doctors = [];
 
+  //getters for the data
+  List<DatabasePatient> get patients => _patients;
+  List<DatabaseVisit> get visits => _visits;
+  List<DatabaseDoctor> get doctors => _doctors;
+
   //temporary visit and doctor objects for getting the data
   final DatabaseVisit _tempVisit = DatabaseVisit(diagnosis: 'Fever', docId: 1, amount: 1000, id: 1, userId: 1, visitDate: DateTime.now().toString());
   final DatabaseDoctor _tempDoctor = DatabaseDoctor(id: 1, name: 'Dr. Sohail', specialization: 'General Physician');
@@ -45,6 +50,24 @@ class HospitalSystem extends ChangeNotifier {
     _patients = [];
     _visits = [];
     _doctors = [];
+    notifyListeners();
+  }
+
+  //Modifying and adding new data:
+
+  Future<void> addNewPatient(String name) async {
+    final DatabasePatient newPatient = DatabasePatient(id: _patients.length + 1, name: name, admittedOn: DateTime.now().toString());
+    //time in milliseconds since epoch
+    final temp = DateTime.now().millisecondsSinceEpoch;
+    await _patientService.createPatient(name: name, admittedOn: temp.toString());
+    _patients.add(newPatient);
+    notifyListeners();
+  }
+
+  Future<void> addNewVisit(String diagnosis, int amount, int patientId, int docId) async {
+    final DatabaseVisit newVisit = DatabaseVisit(id: _visits.length + 1, diagnosis: diagnosis, amount: amount, visitDate: DateTime.now().toString(), userId: patientId, docId: docId);
+    await _tempVisit.createVisit(diagnosis: diagnosis, amount: amount, visitDate: DateTime.now().toString(), userId: patientId, docId: docId);
+    _visits.add(newVisit);
     notifyListeners();
   }
 }
