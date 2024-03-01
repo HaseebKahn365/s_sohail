@@ -193,6 +193,13 @@ class DatabaseVisit {
     }
   }
 
+  //getAllVisits from the table of visits and return a List of DatabaseVisit
+  Future<List<DatabaseVisit>> getAllVisits() async {
+    final db = _getDatabaseOrThrow();
+    final results = await db.query(visitTable);
+    return results.map((e) => DatabaseVisit.fromRow(e)).toList();
+  }
+
   //create visit
   Future<DatabaseVisit> createVisit({required int amount, required String diagnosis, required int userId, required int docId, required String visitDate}) async {
     final db = _getDatabaseOrThrow();
