@@ -16,14 +16,17 @@ On tapping the pay Bills button an alert dialogue box shows up showing whether w
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:s_sohail/classes_and_vars/buisiness_logic_and_classes.dart';
 
 import 'package:s_sohail/classes_and_vars/temp_ui_classes.dart';
 import 'package:s_sohail/services/hospital_services.dart';
+import 'package:sqflite/sqflite.dart';
 
 class PatientScreen extends ConsumerStatefulWidget {
-  // final Patient patient;
+  final DatabasePatient patient;
+  final HospitalSystem hospitalSystem;
 
-  const PatientScreen({Key? key}) : super(key: key);
+  const PatientScreen({Key? key, required this.patient, required this.hospitalSystem}) : super(key: key);
 
   @override
   _PatientScreenState createState() => _PatientScreenState();
@@ -34,28 +37,20 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
   late TextEditingController amountController;
 
   //creating temporary list of visits
-  // List<Visit> visits = [
-  //   Visit(diagnosis: 'Fever', amountCharged: 100, date: DateTime.now()),
-  //   Visit(diagnosis: 'Cough', amountCharged: 200, date: DateTime.now()),
-  // ];
+  List<DatabaseVisit> visits = [];
 
-  List<DatabaseVisit> visitsFromDb = [];
   @override
   void initState() {
     super.initState();
     diagnosisController = TextEditingController();
     amountController = TextEditingController();
-    getallVisits();
+    getMyVisits();
   }
 
-  //init can't be async
-  void getallVisits() async {
-    // await visitsFromDb.add(tempVisitObject.getVisitsForPatient( 21));
-
-    print(visitsFromDb);
+  void getMyVisits() {
+    visits = widget.hospitalSystem.visits.where((visit) => visit.userId == widget.patient.id).toList();
+    setState(() {});
   }
-
-  //this boolean is for appointment type. and also the radio buttons
 
   bool isEmergency = false;
 
@@ -69,22 +64,24 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //converting the string epoch milliseconds to DateTime
+    final DateTime newDate = DateTime.fromMillisecondsSinceEpoch(int.parse(widget.patient.admittedOn));
     return Scaffold(
       appBar: AppBar(
         //increase the app bar size
         toolbarHeight: 100,
-        // title: Text(widget.patient.name),
+        title: Text(widget.patient.name),
         centerTitle: true,
       ),
       body: ListView(
         children: [
           ListTile(
             //showing time in 12 hours formate
-            // title: Text('Admitted on: ${widget.patient.admittedOn.day}/${widget.patient.admittedOn.month}/${widget.patient.admittedOn.year} at ${widget.patient.admittedOn.hour > 12 ? widget.patient.admittedOn.hour - 12 : widget.patient.admittedOn.hour}:${widget.patient.admittedOn.minute} ${widget.patient.admittedOn.hour > 12 ? 'PM' : 'AM'} '),
+            title: Text('Admitted on: ${newDate.day}/${newDate.month}/${newDate.year} at ${newDate.hour > 12 ? newDate.hour - 12 : newDate.hour}:${newDate.minute} ${newDate.hour > 12 ? 'PM' : 'AM'} '),
             //total visits
             subtitle: Padding(
               padding: const EdgeInsets.only(top: 10.0),
-              // child: Text('Total visits: ${visits.length}'),
+              child: Text('Total visits: ${visits.length}'),
             ),
           ),
           const Divider(),
@@ -165,11 +162,11 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
               ),
             ),
             children: [
-              // ListTile(
-              //   title: Text(
-              //     // 'Name: ${widget.patient.name}',
-              //   ),
-              // ),
+              ListTile(
+                title: Text(
+                  'Name: ${widget.patient.name}',
+                ),
+              ),
               ListTile(
                 title: Text('Father Name: '),
               ),
@@ -186,7 +183,7 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
                   //getting all the table of visit just for testing and displaying all the  visits
 
                   return Column(
-                    children: visitsFromDb.map((visit) {
+                    children: visits.map((visit) {
                       return ListTile(
                         title: Text('Diagnosis: ${visit.diagnosis}'),
                         subtitle: Text(
@@ -207,7 +204,7 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
                   // final visits = watch(patientProvider(widget.patient).select((value) => value.visits));
                   return ListTile(
                     title: Text('Total bill: 199'),
-                    // subtitle: Text('Number of visits: ${visits.length}'),
+                    subtitle: Text('Number of visits: ${visits.length}'),
                     trailing: ElevatedButton(
                       onPressed: () {
                         bool isPayedByInsurance = false;
@@ -328,6 +325,9 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
                 },
               ),
             ],
+          ),
+          const SizedBox(
+            height: 50,
           ),
         ],
       ),

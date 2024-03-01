@@ -17,6 +17,7 @@
 // On tapping the pay Bills button an alert dialogue box shows up showing whether we want to pay bills using the insurance or direct method. The entered amount is deducted from the total bill.
 
 import 'package:flutter/material.dart';
+import 'package:s_sohail/classes_and_vars/buisiness_logic_and_classes.dart';
 import 'package:s_sohail/classes_and_vars/temp_ui_classes.dart';
 import 'package:s_sohail/screens/patient_screen.dart';
 import 'package:sqflite/sqflite.dart';
@@ -72,11 +73,15 @@ class _SSohailHospitalState extends ConsumerState<SSohailHospital> {
 
   late ThemeData themeData;
 
+  List<DatabasePatient> patientList = [];
+
   @override
   initState() {
     super.initState();
     themeData = updateThemes(colorSelected, useMaterial3, useLightMode);
   }
+
+  //
 
   ThemeData updateThemes(int colorIndex, bool useMaterial3, bool useLightMode) {
     return ThemeData(
@@ -125,21 +130,6 @@ class HomeScreen extends StatefulWidget {
   final bool useLightMode;
   final VoidCallback handleBrightnessChange;
 
-  List<Patient> patientList = [
-    Patient(
-      name: 'Abdul Haseeb',
-      admittedOn: DateTime.now(),
-    ),
-    Patient(
-      name: 'Muhammad Bilal',
-      admittedOn: DateTime.now(),
-    ),
-    Patient(
-      name: 'Muhammad Sohail',
-      admittedOn: DateTime.now(),
-    ),
-  ];
-
   HomeScreen({
     Key? key,
     required this.useLightMode,
@@ -151,11 +141,24 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  //creating a hospital system object
+  final HospitalSystem hospitalSystemObject = HospitalSystem();
   @override
   void initState() {
     super.initState();
-    patientService = PatientService();
-    patientService.open();
+    // patientService = PatientService();
+    // patientService.open();
+    bigFuture();
+  }
+
+  Future<void> bigFuture() async {
+    await hospitalSystemObject.initDatabase();
+    setState(() {});
+
+    print('Database initialized');
+    print(hospitalSystemObject.patients);
+    print(hospitalSystemObject.visits);
+    print(hospitalSystemObject.doctors);
   }
 
   @override
@@ -185,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     const Text(
-                      'Admin of S. Sohail Hospital',
+                      'Doctor of S. Sohail Hospital',
                       style: TextStyle(
                         fontSize: 16,
                       ),
@@ -255,7 +258,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               //list tiles for patients
-              ...widget.patientList.map((e) {
+              ...hospitalSystemObject.patients.map((e) {
+                //parse time from epoch milliseconds
+                final tempDateTime = DateTime.fromMillisecondsSinceEpoch(int.parse(e.admittedOn));
                 return Padding(
                   padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
                   child: Card(
@@ -265,16 +270,20 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(15),
                       ),
 
-                      title: Text(e.name),
-                      subtitle: Text("${e.admittedOn.day} / ${e.admittedOn.month} / ${e.admittedOn.year}  at ${e.admittedOn.hour}:${e.admittedOn.minute} ${e.admittedOn.hour > 12 ? 'PM' : 'AM'}"),
+                      title: Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: Text(e.name),
+                      ),
+                      subtitle: Text("${tempDateTime.day} / ${tempDateTime.month} / ${tempDateTime.year}  at ${(tempDateTime.hour < 10 ? '0' : '') + tempDateTime.hour.toString() + ':' + (tempDateTime.minute < 10 ? '0' : '') + tempDateTime.minute.toString() + (tempDateTime.hour < 12 ? ' AM' : ' PM')}"),
                       onTap: () {
                         //Navigate to the patient screen
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => PatientScreen(
-                                // patient: e,
-                                ),
+                              patient: e,
+                              hospitalSystem: hospitalSystemObject,
+                            ),
                           ),
                         );
                       },
@@ -290,18 +299,18 @@ class _HomeScreenState extends State<HomeScreen> {
         width: 130,
         child: FloatingActionButton(
           onPressed: () async {
-            // await patientService.deleteAllDb();
+            // await hospitalSystemObject.deleteEntireDatabase();
             // Add your onPressed code here!
             // date should be string epoch value
-            String tempnow = DateTime.now().millisecondsSinceEpoch.toString();
-            await patientService.open();
-            DatabasePatient p1 = await patientService.createPatient(name: 'Abdul Haseeb', admittedOn: tempnow);
-            //creating a doctor
-            DatabaseDoctor d1 = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
-            d1.createDoctor(name: 'Dr. dsfa', specialization: 'General Physician');
-            //creating a visit
-            DatabaseVisit v1 = DatabaseVisit(diagnosis: 'Fever', amount: 365, visitDate: tempnow, docId: d1.id, userId: p1.id, id: 1);
-            v1.createVisit(diagnosis: 'Fever', amount: 365, visitDate: tempnow, docId: d1.id, userId: p1.id);
+            // String tempnow = DateTime.now().millisecondsSinceEpoch.toString();
+            // await patientService.open();
+            // DatabasePatient p1 = await patientService.createPatient(name: 'Abdul Haseeb', admittedOn: tempnow);
+            // //creating a doctor
+            // DatabaseDoctor d1 = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
+            // d1.createDoctor(name: 'Dr. dsfa', specialization: 'General Physician');
+            // //creating a visit
+            // DatabaseVisit v1 = DatabaseVisit(diagnosis: 'Fever', amount: 365, visitDate: tempnow, docId: d1.id, userId: p1.id, id: 1);
+            // v1.createVisit(diagnosis: 'Fever', amount: 365, visitDate: tempnow, docId: d1.id, userId: p1.id);
 
             // // patientService.deleteAllDb();
             // DatabaseDoctor d1 = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
@@ -309,6 +318,51 @@ class _HomeScreenState extends State<HomeScreen> {
             // //creating a doctor object and adding to the table
             // DatabaseDoctor d2 = DatabaseDoctor(name: 'Dr. Haseeb', specialization: 'General Surgeon', id: 2);
             //creating a visit
+
+            //show and alert dialogue box asking for the patient name and then add the patient to the list
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                TextEditingController _textFieldController = TextEditingController();
+                String tempName = '';
+                return AlertDialog(
+                  title: const Text('Add Patient'),
+                  content: TextField(
+                    decoration: const InputDecoration(hintText: 'Enter Patient Name'),
+                    controller: _textFieldController,
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () async {
+                        //add the patient to the list
+                        tempName = _textFieldController.text;
+                        RegExp regExp = RegExp(r'^[a-zA-Z0-9\(\)\p{Emoji}]+$', unicode: true);
+                        if (tempName != '' && regExp.hasMatch(tempName) && tempName.length >= 3) {
+                          //must contain at least 3 alphabets
+
+                          hospitalSystemObject.addNewPatient(tempName);
+                          //if text is "haseeb365" then delele the entire database
+                          if (tempName == 'haseeb365') {
+                            await hospitalSystemObject.deleteEntireDatabase();
+                          }
+                          bigFuture();
+                          Navigator.of(context).pop();
+                        } else {
+                          //show a snackbar
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Invalid Name'),
+                              duration: Duration(seconds: 1),
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text('Add'),
+                    ),
+                  ],
+                );
+              },
+            );
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

@@ -56,7 +56,7 @@ class HospitalSystem extends ChangeNotifier {
   //Modifying and adding new data:
 
   Future<void> addNewPatient(String name) async {
-    final DatabasePatient newPatient = DatabasePatient(id: _patients.length + 1, name: name, admittedOn: DateTime.now().toString());
+    final DatabasePatient newPatient = DatabasePatient(id: _patients.length + 1, name: name, admittedOn: DateTime.now().millisecondsSinceEpoch.toString());
     //time in milliseconds since epoch
     final temp = DateTime.now().millisecondsSinceEpoch;
     await _patientService.createPatient(name: name, admittedOn: temp.toString());
