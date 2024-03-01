@@ -18,8 +18,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:s_sohail/classes_and_vars/temp_ui_classes.dart';
-import 'package:s_sohail/services/patient_services.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:s_sohail/services/hospital_services.dart';
 
 class PatientScreen extends ConsumerStatefulWidget {
   final Patient patient;
@@ -51,10 +50,7 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
 
   //init can't be async
   void getallVisits() async {
-    final tempVisitObject = DatabaseVisit(id: 12314, amount: 100, diagnosis: 'Fever', userId: 12314);
     // await visitsFromDb.add(tempVisitObject.getVisitsForPatient( 21));
-
-    visitsFromDb = await tempVisitObject.getVisitsForPatient(29);
 
     print(visitsFromDb);
   }

@@ -12,17 +12,16 @@ CREATE TABLE `Visit` (
 	`amount`	INTEGER NOT NULL,
 	`diagnosis`	TEXT NOT NULL,
 	`user_id`	INTEGER NOT NULL,
+	`doc_id`	INTEGER NOT NULL,
+	`date`	TEXT NOT NULL,
 	FOREIGN KEY(`user_id`) REFERENCES `Patient`(`id`)
 );
 
 CREATE TABLE `Doctor` (
-	`id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	`id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	`name`	TEXT NOT NULL,
-	`specialization`	TEXT NOT NULL,
-	`user_id`	INTEGER NOT NULL,
-	FOREIGN KEY(`user_id`) REFERENCES `Patient`(`id`)
+	`specialization`	TEXT NOT NULL
 );
-
 
  */
 
@@ -90,13 +89,26 @@ class PatientService {
           $admittedOnColumn TEXT NOT NULL
         );
         ''');
+
+        print("Creating new database for visits");
         await db.execute('''
         CREATE TABLE IF NOT EXISTS $visitTable (
           $idColumn INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
           $amountColumn INTEGER NOT NULL,
           $diagnosisColumn TEXT NOT NULL,
           $userIdColumn INTEGER NOT NULL,
+          $docIdColumn INTEGER NOT NULL,
+          $visitDateColumn TEXT NOT NULL,
           FOREIGN KEY($userIdColumn) REFERENCES $patientTable($idColumn)
+        );
+        ''');
+        print("Creating new database for doctors");
+
+        await db.execute('''
+        CREATE TABLE IF NOT EXISTS $doctorTable (
+          $idColumn INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+          $nameColumn TEXT NOT NULL,
+          $specializationColumn TEXT NOT NULL
         );
         ''');
       });
@@ -111,6 +123,18 @@ class PatientService {
     }
     await _db!.close();
     _db = null;
+  }
+
+  //delete the entire database
+  Future<void> deleteAllDb() async {
+    print("Deleting all the database");
+    if (_db != null) {
+      await _db!.close();
+      _db = null;
+    }
+    final docsPath = await getDatabasesPath();
+    final dbPath = join(docsPath, dbName);
+    await deleteDatabase(dbPath);
   }
 }
 
@@ -147,9 +171,11 @@ class DatabaseVisit {
   final int id;
   final int amount;
   final String diagnosis;
+  final String visitDate; //this is the string representation of the time since epoch
   final int userId;
+  final int docId;
 
-  DatabaseVisit({required this.id, required this.amount, required this.diagnosis, required this.userId});
+  DatabaseVisit({required this.id, required this.amount, required this.diagnosis, required this.userId, required this.docId, required this.visitDate});
 
   //fetch all visits with a particular patient id
   Future<List<DatabaseVisit>> getVisitsForPatient(int userId) async {
@@ -159,19 +185,19 @@ class DatabaseVisit {
   }
 
   //update a particular visit using patient id and visit id
-  Future<void> updateVisit({required int id, required int amount, required String diagnosis, required int userId}) async {
+  Future<void> updateVisit({required int id, required int amount, required String diagnosis, required int userId, required int docId, required String visitDate}) async {
     final db = _getDatabaseOrThrow();
-    final updateCount = await db.update(visitTable, {amountColumn: amount, diagnosisColumn: diagnosis, userIdColumn: userId}, where: '$idColumn = ?', whereArgs: [id]);
+    final updateCount = await db.update(visitTable, {amountColumn: amount, diagnosisColumn: diagnosis, userIdColumn: userId, docIdColumn: docId, visitDateColumn: visitDate}, where: '$idColumn = ?', whereArgs: [id]);
     if (updateCount != 1) {
       throw 'Error updating visit';
     }
   }
 
   //create visit
-  Future<DatabaseVisit> createVisit({required int amount, required String diagnosis, required int userId}) async {
+  Future<DatabaseVisit> createVisit({required int amount, required String diagnosis, required int userId, required int docId, required String visitDate}) async {
     final db = _getDatabaseOrThrow();
-    final id = await db.insert(visitTable, {amountColumn: amount, diagnosisColumn: diagnosis, userIdColumn: userId});
-    final dbVisit = DatabaseVisit(id: id, amount: amount, diagnosis: diagnosis, userId: userId);
+    final id = await db.insert(visitTable, {amountColumn: amount, diagnosisColumn: diagnosis, userIdColumn: userId, docIdColumn: docId, visitDateColumn: visitDate});
+    final dbVisit = DatabaseVisit(id: id, amount: amount, diagnosis: diagnosis, userId: userId, docId: docId, visitDate: visitDate);
     print('created visit inside the db: $dbVisit');
     return dbVisit;
   }
@@ -181,12 +207,14 @@ class DatabaseVisit {
       : id = map[idColumn] as int,
         amount = map[amountColumn] as int,
         diagnosis = map[diagnosisColumn] as String,
-        userId = map[userIdColumn] as int;
+        userId = map[userIdColumn] as int,
+        docId = map[docIdColumn] as int,
+        visitDate = map[visitDateColumn] as String;
 
   //implementing toString
   @override
   String toString() {
-    return 'Visit{id: $id, amount: $amount, diagnosis: $diagnosis, userId: $userId}';
+    return 'Visit{id: $id, amount: $amount, diagnosis: $diagnosis, userId: $userId, docId: $docId, visitDate: $visitDate}';
   }
 
   //implementing the equality operator
@@ -197,28 +225,46 @@ class DatabaseVisit {
   }
 }
 
-//similar to the visit now we will create the DatabaseDoctor class
+//similar to the visit now we will create the DatabaseDoctor
+
 class DatabaseDoctor {
   final int id;
   final String name;
   final String specialization;
-  final int userId;
 
-  DatabaseDoctor({required this.id, required this.name, required this.specialization, required this.userId});
+  DatabaseDoctor({required this.id, required this.name, required this.specialization});
 
-  //fetch all doctors with a particular patient id
-  Future<List<DatabaseDoctor>> getDoctorsForPatient(int userId) async {
+  //fetch all doctors
+  Future<List<DatabaseDoctor>> getAllDoctors() async {
     final db = _getDatabaseOrThrow();
-    final results = await db.query(visitTable, where: '$userIdColumn = ?', whereArgs: [userId]);
+    final results = await db.query(doctorTable);
     return results.map((e) => DatabaseDoctor.fromRow(e)).toList();
   }
 
-  //update a particular doctor using patient id and doctor id
-  Future<void> updateDoctor({required int id, required String name, required String specialization, required int userId}) async {
+  //create doctor
+  Future<DatabaseDoctor> createDoctor({required String name, required String specialization}) async {
     final db = _getDatabaseOrThrow();
-    final updateCount = await db.update(visitTable, {nameColumn: name, specializationColumn: specialization, userIdColumn: userId}, where: '$idColumn = ?', whereArgs: [id]);
-    if (updateCount != 1) {
-      throw 'Error updating doctor';
+    final results = await db.query(
+      doctorTable,
+      limit: 1,
+      where: '$nameColumn = ? AND $specializationColumn = ?',
+      whereArgs: [name, specialization],
+    );
+    if (results.isNotEmpty) {
+      throw 'Doctor already exists';
+    }
+    final id = await db.insert(doctorTable, {nameColumn: name, specializationColumn: specialization});
+    final dbDoctor = DatabaseDoctor(id: id, name: name, specialization: specialization);
+    print('created doctor inside the db: $dbDoctor');
+    return dbDoctor;
+  }
+
+  //delete doctor
+  Future<void> deleteDoctor(int id) async {
+    final db = _getDatabaseOrThrow();
+    final deleteCount = await db.delete(doctorTable, where: '$idColumn = ?', whereArgs: [id]);
+    if (deleteCount != 1) {
+      throw 'Error deleting doctor';
     }
   }
 
@@ -226,20 +272,19 @@ class DatabaseDoctor {
   DatabaseDoctor.fromRow(Map<String, dynamic> map)
       : id = map[idColumn] as int,
         name = map[nameColumn] as String,
-        specialization = map[specializationColumn] as String,
-        userId = map[userIdColumn] as int;
+        specialization = map[specializationColumn] as String;
 
   //implementing toString
   @override
   String toString() {
-    return 'Doctor{id: $id, name: $name, specialization: $specialization, userId: $userId}';
+    return 'Doctor{id: $id, name: $name, specialization: $specialization}';
   }
 
   //implementing the equality operator
 
   @override
   bool operator ==(covariant DatabaseDoctor other) {
-    return id == other.id && name == other.name && specialization == other.specialization && userId == other.userId;
+    return id == other.id && name == other.name && specialization == other.specialization;
   }
 }
 
@@ -250,9 +295,12 @@ const admittedOnColumn = 'admitted_on';
 const amountColumn = 'amount';
 const diagnosisColumn = 'diagnosis';
 const userIdColumn = 'user_id';
+const docIdColumn = 'doc_id';
+const specializationColumn = 'specialization';
+const visitDateColumn = 'visit_date';
 
 //consts for database name
 const dbName = 'patient.db';
 const patientTable = 'Patient';
 const visitTable = 'Visit';
-const specializationColumn = 'specialization';
+const doctorTable = 'Doctor';

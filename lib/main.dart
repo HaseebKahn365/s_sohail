@@ -23,7 +23,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'services/patient_services.dart';
+import 'services/hospital_services.dart';
 
 void main() {
   //using riverpod provider scope
@@ -290,12 +290,24 @@ class _HomeScreenState extends State<HomeScreen> {
         width: 130,
         child: FloatingActionButton(
           onPressed: () async {
+            // await patientService.deleteAllDb();
             // Add your onPressed code here!
-            DatabasePatient p1 = await patientService.createPatient(name: 'Abdul Haseeb', admittedOn: DateTime.now().toString());
-            //create two random visits for this patient
-            DatabaseVisit tempVisit = DatabaseVisit(id: 21, amount: 21, diagnosis: "diagnosis", userId: 2342);
-            tempVisit.createVisit(amount: 365, diagnosis: "fever101", userId: p1.id);
-            tempVisit.createVisit(amount: 365, diagnosis: "fever102", userId: p1.id);
+            // date should be string epoch value
+            String tempnow = DateTime.now().millisecondsSinceEpoch.toString();
+            DatabasePatient p1 = await patientService.createPatient(name: 'Abdul Haseeb', admittedOn: tempnow);
+            //creating a doctor
+            DatabaseDoctor d1 = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
+            // d1.createDoctor(name: 'Dr. dsfa', specialization: 'General Physician');
+            //creating a visit
+            DatabaseVisit v1 = DatabaseVisit(diagnosis: 'Fever', amount: 365, visitDate: tempnow, docId: d1.id, userId: p1.id, id: 1);
+            v1.createVisit(diagnosis: 'Fever', amount: 365, visitDate: tempnow, docId: d1.id, userId: p1.id);
+
+            // // patientService.deleteAllDb();
+            // DatabaseDoctor d1 = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
+            // d1.createDoctor(name: 'Dr. dsfa', specialization: 'General Physician');
+            // //creating a doctor object and adding to the table
+            // DatabaseDoctor d2 = DatabaseDoctor(name: 'Dr. Haseeb', specialization: 'General Surgeon', id: 2);
+            //creating a visit
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
