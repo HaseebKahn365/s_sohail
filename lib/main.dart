@@ -19,8 +19,11 @@
 import 'package:flutter/material.dart';
 import 'package:s_sohail/classes_and_vars/temp_ui_classes.dart';
 import 'package:s_sohail/screens/patient_screen.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'services/patient_services.dart';
 
 void main() {
   //using riverpod provider scope
@@ -30,6 +33,8 @@ void main() {
     ),
   );
 }
+
+late final PatientService patientService;
 
 class SSohailHospital extends ConsumerStatefulWidget {
   const SSohailHospital({Key? key}) : super(key: key);
@@ -149,6 +154,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    patientService = PatientService();
+    patientService.open();
   }
 
   @override
@@ -282,8 +289,13 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: SizedBox(
         width: 130,
         child: FloatingActionButton(
-          onPressed: () {
+          onPressed: () async {
             // Add your onPressed code here!
+            DatabasePatient p1 = await patientService.createPatient(name: 'Abdul Haseeb', admittedOn: DateTime.now().toString());
+            //create two random visits for this patient
+            DatabaseVisit tempVisit = DatabaseVisit(id: 21, amount: 21, diagnosis: "diagnosis", userId: 2342);
+            tempVisit.createVisit(amount: 365, diagnosis: "fever101", userId: p1.id);
+            tempVisit.createVisit(amount: 365, diagnosis: "fever102", userId: p1.id);
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

@@ -15,6 +15,14 @@ CREATE TABLE `Visit` (
 	FOREIGN KEY(`user_id`) REFERENCES `Patient`(`id`)
 );
 
+CREATE TABLE `Doctor` (
+	`id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	`name`	TEXT NOT NULL,
+	`specialization`	TEXT NOT NULL,
+	`user_id`	INTEGER NOT NULL,
+	FOREIGN KEY(`user_id`) REFERENCES `Patient`(`id`)
+);
+
 
  */
 
@@ -71,6 +79,7 @@ class PatientService {
       throw 'Database already open';
     }
     try {
+      print("Creating new database for patients");
       final docsPath = await getDatabasesPath();
       final dbPath = join(docsPath, dbName);
       _db = await openDatabase(dbPath, version: 1, onCreate: (db, version) async {
@@ -188,6 +197,52 @@ class DatabaseVisit {
   }
 }
 
+//similar to the visit now we will create the DatabaseDoctor class
+class DatabaseDoctor {
+  final int id;
+  final String name;
+  final String specialization;
+  final int userId;
+
+  DatabaseDoctor({required this.id, required this.name, required this.specialization, required this.userId});
+
+  //fetch all doctors with a particular patient id
+  Future<List<DatabaseDoctor>> getDoctorsForPatient(int userId) async {
+    final db = _getDatabaseOrThrow();
+    final results = await db.query(visitTable, where: '$userIdColumn = ?', whereArgs: [userId]);
+    return results.map((e) => DatabaseDoctor.fromRow(e)).toList();
+  }
+
+  //update a particular doctor using patient id and doctor id
+  Future<void> updateDoctor({required int id, required String name, required String specialization, required int userId}) async {
+    final db = _getDatabaseOrThrow();
+    final updateCount = await db.update(visitTable, {nameColumn: name, specializationColumn: specialization, userIdColumn: userId}, where: '$idColumn = ?', whereArgs: [id]);
+    if (updateCount != 1) {
+      throw 'Error updating doctor';
+    }
+  }
+
+  //named constructor for doctor from database row
+  DatabaseDoctor.fromRow(Map<String, dynamic> map)
+      : id = map[idColumn] as int,
+        name = map[nameColumn] as String,
+        specialization = map[specializationColumn] as String,
+        userId = map[userIdColumn] as int;
+
+  //implementing toString
+  @override
+  String toString() {
+    return 'Doctor{id: $id, name: $name, specialization: $specialization, userId: $userId}';
+  }
+
+  //implementing the equality operator
+
+  @override
+  bool operator ==(covariant DatabaseDoctor other) {
+    return id == other.id && name == other.name && specialization == other.specialization && userId == other.userId;
+  }
+}
+
 //creating consts for the fields of the database:
 const idColumn = 'id';
 const nameColumn = 'name';
@@ -200,3 +255,4 @@ const userIdColumn = 'user_id';
 const dbName = 'patient.db';
 const patientTable = 'Patient';
 const visitTable = 'Visit';
+const specializationColumn = 'specialization';

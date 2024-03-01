@@ -18,6 +18,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:s_sohail/classes_and_vars/temp_ui_classes.dart';
+import 'package:s_sohail/services/patient_services.dart';
+import 'package:sqflite/sqflite.dart';
 
 class PatientScreen extends ConsumerStatefulWidget {
   final Patient patient;
@@ -38,11 +40,23 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
     Visit(diagnosis: 'Cough', amountCharged: 200, date: DateTime.now()),
   ];
 
+  List<DatabaseVisit> visitsFromDb = [];
   @override
   void initState() {
     super.initState();
     diagnosisController = TextEditingController();
     amountController = TextEditingController();
+    getallVisits();
+  }
+
+  //init can't be async
+  void getallVisits() async {
+    final tempVisitObject = DatabaseVisit(id: 12314, amount: 100, diagnosis: 'Fever', userId: 12314);
+    // await visitsFromDb.add(tempVisitObject.getVisitsForPatient( 21));
+
+    visitsFromDb = await tempVisitObject.getVisitsForPatient(29);
+
+    print(visitsFromDb);
   }
 
   //this boolean is for appointment type. and also the radio buttons
@@ -53,6 +67,7 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
   void dispose() {
     diagnosisController.dispose();
     amountController.dispose();
+
     super.dispose();
   }
 
@@ -172,13 +187,14 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
             children: [
               Consumer(
                 builder: (context, watch, child) {
-                  // final visits = watch(patientProvider(widget.patient).select((value) => value.visits));
+                  //getting all the table of visit just for testing and displaying all the  visits
+
                   return Column(
-                    children: visits.map((visit) {
+                    children: visitsFromDb.map((visit) {
                       return ListTile(
                         title: Text('Diagnosis: ${visit.diagnosis}'),
                         subtitle: Text(
-                          'Amount charged: ${visit.amountCharged}',
+                          'Amount charged: ${visit.amount}',
                         ),
                       );
                     }).toList(),
