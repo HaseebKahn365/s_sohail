@@ -18,17 +18,24 @@
 
 import 'package:flutter/material.dart';
 import 'package:s_sohail/classes_and_vars/temp_ui_classes.dart';
+import 'package:s_sohail/screens/patient_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(const SSohailHospital());
+  //using riverpod provider scope
+  runApp(
+    ProviderScope(
+      child: SSohailHospital(),
+    ),
+  );
 }
 
-class SSohailHospital extends StatefulWidget {
+class SSohailHospital extends ConsumerStatefulWidget {
   const SSohailHospital({Key? key}) : super(key: key);
 
   @override
-  State<SSohailHospital> createState() => _SSohailHospitalState();
+  _SSohailHospitalState createState() => _SSohailHospitalState();
 }
 
 const double narrowScreenWidthThreshold = 450;
@@ -52,7 +59,7 @@ const List<Color> colorOptions = [
 ];
 const List<String> colorText = <String>["M3 Baseline", "Blue", "Teal", "Green", "Yellow", "Orange", "Pink", "Lime"];
 
-class _SSohailHospitalState extends State<SSohailHospital> {
+class _SSohailHospitalState extends ConsumerState<SSohailHospital> {
   bool useMaterial3 = true;
   bool useLightMode = true;
   int colorSelected = 0;
@@ -122,6 +129,10 @@ class HomeScreen extends StatefulWidget {
       name: 'Muhammad Bilal',
       admittedOn: DateTime.now(),
     ),
+    Patient(
+      name: 'Muhammad Sohail',
+      admittedOn: DateTime.now(),
+    ),
   ];
 
   HomeScreen({
@@ -167,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     const Text(
-                      'S. Sohail Hospital',
+                      'Admin of S. Sohail Hospital',
                       style: TextStyle(
                         fontSize: 16,
                       ),
@@ -219,13 +230,23 @@ class _HomeScreenState extends State<HomeScreen> {
           //create an add patient button
           Column(
             children: [
-              ElevatedButton(
-                onPressed: () {
-                  // Add your onPressed code here!
-                },
-                child: const Text('Add Patient'),
+              //create a search bar using a text field
+              SizedBox(
+                width: 250,
+                child: TextField(
+                  decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.all(15),
+                    hintText: '           Search',
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.only(left: 20.0, right: 10),
+                      child: Icon(Icons.search),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                  ),
+                ),
               ),
-
               //list tiles for patients
               ...widget.patientList.map((e) {
                 return Padding(
@@ -240,7 +261,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       title: Text(e.name),
                       subtitle: Text("${e.admittedOn.day} / ${e.admittedOn.month} / ${e.admittedOn.year}  at ${e.admittedOn.hour}:${e.admittedOn.minute} ${e.admittedOn.hour > 12 ? 'PM' : 'AM'}"),
                       onTap: () {
-                        // Add your onPressed code here!
+                        //Navigate to the patient screen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PatientScreen(
+                              patient: e,
+                            ),
+                          ),
+                        );
                       },
                     ),
                   ),
@@ -250,11 +279,20 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Add your onPressed code here!
-        },
-        child: const Icon(Icons.add),
+      floatingActionButton: SizedBox(
+        width: 130,
+        child: FloatingActionButton(
+          onPressed: () {
+            // Add your onPressed code here!
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(Icons.medical_services), // replace with your icon
+              Text('  Add Patient'),
+            ],
+          ),
+        ),
       ),
     );
   }
