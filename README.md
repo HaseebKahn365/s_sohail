@@ -1,17 +1,46 @@
 # s_sohail
 
-Introduction:
-This is a simple flutter application that is primarily designed for reading and writing data to a local database for persistent storage. The purpose is to take the data related to the patient and store it on a relational database using the SQflite package available as a package for flutter.
-Here is an overview of what the interface is going to look like: 
-The name of the hospital is S.Sohail Hospital
-Home screen overview:
-At the home screen we will have a search in the app bar then the list view of the list tiles for the patients. We can add a patient using the floating action button. Here is what happens when we tap the floating action button. An alert dialogue box appears asking for the basic details about the patient. When the patient is created, it appears on the home screen as the listview updates.
-On tapping the List tile of the patient, we should be navigated to the patient screen, where we are going to be able to see the patient’s information which is specified below:
+## Introduction
+This is a simple Flutter application designed for reading and writing data to a local database for persistent storage. The main functionality revolves around managing patient data for S. Sohail Hospital. It utilizes the SQflite package for database management within the Flutter framework.
 
-The Patient Screen:
-At the patient screen, we can set the appointment. The appbar should have the name of the patient, afterwards, we select the type of appointment whether it is an emergency or a visit using the radio buttons. 
-Then we will have a description of the diagnosis. Which we will get using a Tex field. We also use a field for the amount charged per visit. On the right side we have an update button to add the visit to the history. 
-Then we will have an expandable list tile to view the details of the patient. 
-After this we will have the history of the patient which will be an expandable list containing list tiles about the history of the visits.
-Afterwards we have the bill section that will show the total bill for the patient and the number of visits. And on the right side we will have the Pay Bills button.
-On tapping the pay Bills button an alert dialogue box shows up showing whether we want to pay bills using the insurance or direct method. The entered amount is deducted from the total bill. 
+## Application Overview
+The application interface revolves around managing patient data. Here's an overview of the key features:
+
+### Home Screen
+- The home screen features a search bar in the app bar and a list view of patients.
+- Users can add new patients using the floating action button, which prompts an alert dialogue for entering basic patient details.
+- Tapping on a patient's list tile navigates to the patient screen.
+
+### Patient Screen
+- The patient screen displays detailed information about a selected patient.
+- It includes an app bar with the patient's name, appointment type selection (emergency or visit), diagnosis description input, and amount charged per visit.
+- Users can update and view detailed patient information.
+- It also showcases the patient's visit history, allowing users to view past visits and their details.
+- A bill section displays the total bill for the patient and provides an option to pay bills either through insurance or direct method.
+
+## Implementation Details
+The application is implemented using the following key components:
+
+### `HospitalSystem` Class
+- Manages patient, visit, and doctor data.
+- Provides methods for initializing the database, adding new patients, visits, and doctors, updating visits, and deleting the entire database.
+- Utilizes `ChangeNotifier` for state management.
+
+### `DatabasePatient`, `DatabaseVisit`, and `DatabaseDoctor` Classes
+- Represents the data models for patients, visits, and doctors respectively.
+
+### `PatientService` Class
+- Handles database operations such as creating, retrieving, and deleting patient data.
+
+## Usage
+To use the application:
+1. Ensure Flutter environment is set up.
+2. Clone the repository.
+3. Run the application on a compatible device or emulator.
+
+## Contributing
+Contributions are welcome! Feel free to submit pull requests or open issues for any bugs or feature requests.
+
+## License
+This project is licensed under the [MIT License](LICENSE).
+

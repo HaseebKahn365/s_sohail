@@ -172,6 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (hospitalSystemObject.doctors.isEmpty) {
       await d1.createDoctor(name: 'Dr. Sohail', specialization: 'General Physician');
       await d2.createDoctor(name: 'Haseeb', specialization: 'General Surgeon');
+      selectedDoctor = d1;
     } else {
       selectedDoctor = d1;
       print("selected doctor: $selectedDoctor");
