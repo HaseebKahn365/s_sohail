@@ -15,6 +15,7 @@ On tapping the pay Bills button an alert dialogue box shows up showing whether w
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:s_sohail/classes_and_vars/buisiness_logic_and_classes.dart';
 
@@ -129,6 +130,7 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
               maxLines: 2,
               decoration: InputDecoration(
                 hintText: 'Diagnosis Details',
+                hintStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
                 contentPadding: EdgeInsets.all(20),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -142,6 +144,7 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
               textAlign: TextAlign.center,
               decoration: InputDecoration(
                 hintText: 'Rs. (Charges)',
+                hintStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
                 contentPadding: EdgeInsets.all(10),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(100),
@@ -204,11 +207,19 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
                   return Column(
                     children: visits.map((visit) {
                       return ListTile(
-                          title: Text('Diagnosis: ${visit.diagnosis}'),
-                          subtitle: Text(
-                            'Amount charged: ${visit.amount}',
-                          ),
-                          trailing: Text("Consulted by: ${(visit.docId == 1) ? "Dr. Sohail" : "Haseeb"}"));
+                              title: Text('Diagnosis: ${visit.diagnosis}'),
+                              subtitle: Text(
+                                'Amount charged: ${visit.amount}',
+                              ),
+                              trailing: Text("Consulted by: ${(visit.docId == 1) ? "Dr. Sohail" : "Haseeb"}"))
+                          .animate(effects: [
+                        //applying the animation
+                        FadeEffect(
+                          //setting the duration of the animation
+                          duration: Duration(milliseconds: 500),
+                          delay: Duration(milliseconds: 300 * visits.indexOf(visit)),
+                        ),
+                      ]);
                     }).toList(),
                   );
                 },
@@ -230,138 +241,158 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
                     title: Text('Total bill: ${visits.fold(0, (previousValue, element) => previousValue + element.amount)}'),
                     subtitle: Text('Number of Appointments: ${visits.length}'),
                     trailing: ElevatedButton(
-                      onPressed: () {
-                        bool isPayedByInsurance = false;
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return StatefulBuilder(builder: (context, setState) {
-                              TextEditingController paymentcontroller = TextEditingController();
-                              return AlertDialog(
-                                //center title
-                                title: Center(
-                                  child: Text('Pay bills'),
-                                ),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      'How would you like to pay?\n',
-                                      style: TextStyle(
-                                        fontSize: 17,
+                            onPressed: () {
+                              bool isPayedByInsurance = false;
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return StatefulBuilder(builder: (context, setState) {
+                                    TextEditingController paymentcontroller = TextEditingController();
+                                    return AlertDialog(
+                                      //center title
+                                      title: Center(
+                                        child: Text('Pay bills'),
                                       ),
-                                    ),
-                                    Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            //INSURANCE ADD FLUENT ICON
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Icon(Icons.account_balance),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            'How would you like to pay?\n',
+                                            style: TextStyle(
+                                              fontSize: 17,
                                             ),
-                                            Text(
-                                              'Insurance',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                letterSpacing: 1.5,
+                                          ),
+                                          Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  //INSURANCE ADD FLUENT ICON
+                                                  Padding(
+                                                    padding: const EdgeInsets.all(8.0),
+                                                    child: Icon(Icons.account_balance),
+                                                  ),
+                                                  Text(
+                                                    'Insurance',
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      letterSpacing: 1.5,
+                                                    ),
+                                                  ),
+                                                  //set isPayedByInsurance to true using radio button
+                                                  Radio(
+                                                    value: true,
+                                                    groupValue: isPayedByInsurance,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        isPayedByInsurance = value as bool;
+                                                      });
+                                                    },
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                            //set isPayedByInsurance to true using radio button
-                                            Radio(
-                                              value: true,
-                                              groupValue: isPayedByInsurance,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  isPayedByInsurance = value as bool;
-                                                });
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            //GIFT CARD ADD FLUENT ICON
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Icon(Icons.monetization_on),
-                                            ),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  //GIFT CARD ADD FLUENT ICON
+                                                  Padding(
+                                                    padding: const EdgeInsets.all(8.0),
+                                                    child: Icon(Icons.monetization_on),
+                                                  ),
 
-                                            Text(
-                                              'Direct      ',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                letterSpacing: 1.5,
+                                                  Text(
+                                                    'Direct      ',
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      letterSpacing: 1.5,
+                                                    ),
+                                                  ),
+                                                  Radio(
+                                                    value: false,
+                                                    groupValue: isPayedByInsurance,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        isPayedByInsurance = value as bool;
+                                                      });
+                                                    },
+                                                  ),
+                                                ],
                                               ),
+                                            ],
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: TextField(
+                                              //TODO add  controller
+                                              textAlign: TextAlign.center,
+                                              controller: paymentcontroller,
+                                              decoration: InputDecoration(
+                                                hintText: 'Rs.',
+                                                contentPadding: EdgeInsets.all(10),
+                                                border: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.circular(100),
+                                                ),
+                                              ),
+                                              inputFormatters: [
+                                                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                                              ],
+                                              keyboardType: TextInputType.number,
                                             ),
-                                            Radio(
-                                              value: false,
-                                              groupValue: isPayedByInsurance,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  isPayedByInsurance = value as bool;
-                                                });
-                                              },
-                                            ),
-                                          ],
+                                          ),
+                                        ],
+                                      ),
+                                      actions: [
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            //go through the entire list of visits and keep on subtracting the amount from amount of each visit then update the database
+                                            int totalAmount = int.parse(paymentcontroller.text);
+                                            print("Total amount: $totalAmount");
+                                            for (var visit in visits) {
+                                              if (totalAmount > 0) {
+                                                if (totalAmount >= visit.amount) {
+                                                  totalAmount -= visit.amount;
+                                                  visit.updateVisit(amount: 0, diagnosis: visit.diagnosis, docId: visit.docId, id: visit.id, userId: visit.userId, visitDate: visit.visitDate);
+                                                } else {
+                                                  visit.updateVisit(amount: visit.amount - totalAmount, diagnosis: visit.diagnosis, docId: visit.docId, id: visit.id, userId: visit.userId, visitDate: visit.visitDate);
+                                                  totalAmount = 0;
+                                                }
+                                              }
+                                            }
+                                            await refresh();
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text('Pay').animate(),
                                         ),
                                       ],
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: TextField(
-                                        //TODO add  controller
-                                        textAlign: TextAlign.center,
-                                        controller: paymentcontroller,
-                                        decoration: InputDecoration(
-                                          hintText: 'Rs.',
-                                          contentPadding: EdgeInsets.all(10),
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(100),
-                                          ),
-                                        ),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                                        ],
-                                        keyboardType: TextInputType.number,
+                                    );
+                                  }).animate(
+                                    effects: [
+                                      //fade then shimmer
+                                      FadeEffect(
+                                        duration: Duration(milliseconds: 300),
+                                        delay: Duration(milliseconds: 80),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                actions: [
-                                  ElevatedButton(
-                                    onPressed: () async {
-                                      //go through the entire list of visits and keep on subtracting the amount from amount of each visit then update the database
-                                      int totalAmount = int.parse(paymentcontroller.text);
-                                      print("Total amount: $totalAmount");
-                                      for (var visit in visits) {
-                                        if (totalAmount > 0) {
-                                          if (totalAmount >= visit.amount) {
-                                            totalAmount -= visit.amount;
-                                            visit.updateVisit(amount: 0, diagnosis: visit.diagnosis, docId: visit.docId, id: visit.id, userId: visit.userId, visitDate: visit.visitDate);
-                                          } else {
-                                            visit.updateVisit(amount: visit.amount - totalAmount, diagnosis: visit.diagnosis, docId: visit.docId, id: visit.id, userId: visit.userId, visitDate: visit.visitDate);
-                                            totalAmount = 0;
-                                          }
-                                        }
-                                      }
-                                      await refresh();
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text('Pay'),
-                                  ),
-                                ],
+
+                                      ShimmerEffect(
+                                        duration: Duration(milliseconds: 600),
+                                        //if in light mode show theme.of(context).inverseSurface else show white
+                                        color: Theme.of(context).brightness == Brightness.light ? Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.3) : Colors.white,
+                                        delay: Duration(milliseconds: 300),
+                                      )
+                                    ],
+                                  );
+                                },
                               );
-                            });
-                          },
-                        );
-                      },
-                      child: Text('Pay bills'),
-                    ),
+                            },
+                            child: Text('Pay bills'))
+                        .animate(effects: [
+                      ScaleEffect(
+                        duration: Duration(milliseconds: 200),
+                        delay: Duration(milliseconds: 80),
+                      ),
+                    ]),
                   );
                 },
               ),

@@ -353,6 +353,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             decoration: InputDecoration(
                               contentPadding: const EdgeInsets.all(15),
                               hintText: '           Search',
+                              //trailing clear button
+                              suffixIcon: searchTermController.text.isNotEmpty
+                                  ? IconButton(
+                                      icon: Icon(Icons.clear),
+                                      onPressed: () {
+                                        searchTermController.clear();
+                                        getNewPatients('');
+                                      },
+                                    )
+                                  : null,
                               prefixIcon: Padding(
                                 padding: const EdgeInsets.only(left: 20.0, right: 10),
                                 child: Icon(Icons.search),
