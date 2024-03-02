@@ -17,10 +17,9 @@
 // On tapping the pay Bills button an alert dialogue box shows up showing whether we want to pay bills using the insurance or direct method. The entered amount is deducted from the total bill.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:s_sohail/classes_and_vars/buisiness_logic_and_classes.dart';
-import 'package:s_sohail/classes_and_vars/temp_ui_classes.dart';
 import 'package:s_sohail/screens/patient_screen.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -150,6 +149,11 @@ class _HomeScreenState extends State<HomeScreen> {
     // patientService.open();
     bigFuture();
     print('Creating a doctor');
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        isFirstTime = false;
+      });
+    });
   }
 
   DatabaseDoctor d1 = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
@@ -172,259 +176,322 @@ class _HomeScreenState extends State<HomeScreen> {
       selectedDoctor = d1;
       print("selected doctor: $selectedDoctor");
     }
+    displayedPatients = hospitalSystemObject.patients;
     setState(() {});
   }
 
+  List<DatabasePatient> displayedPatients = [];
+
+  void getNewPatients(String searchTerm) {
+    if (searchTerm == '') {
+      displayedPatients = hospitalSystemObject.patients;
+    } else {
+      displayedPatients = hospitalSystemObject.patients.where((element) => element.name.toLowerCase().contains(searchTerm.toLowerCase())).toList();
+    }
+    setState(() {});
+  }
+
+  TextEditingController searchTermController = TextEditingController();
+  bool isFirstTime = true;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      //creating a simple drawer for theme setting and about me page
-      drawer: Drawer(
-        elevation: 0,
-        child: ListView(
-          // increase the height of the drawer header
-          children: <Widget>[
-            SizedBox(
-              height: 350,
-              child: DrawerHeader(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    //circle avatar for the profile picture
-                    CircleAvatar(
-                      radius: 65,
-                      backgroundImage: (selectedDoctor.name == 'Dr. Sohail') ? AssetImage('assets/sir.png') : AssetImage('assets/profile.png'),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      selectedDoctor.name,
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
-                    ),
-                    const Text(
-                      'Doctor of S. Sohail Hospital',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-
-                    //here we will create 3 chips for 3 different doctors we can select the doctor and make it the selected doctor
-
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+    return
+        //if first time display a circular progress indicator with 2 seconds delay
+        (isFirstTime)
+            ? Scaffold(
+                body: Center(
+                  child: SizedBox(
+                      width: 400,
+                      height: 130,
+                      child: Column(
                         children: [
-                          //creating a simple chip for the doctor
-                          Chip(
-                            label: Text('Dr. Sohail'),
-                            backgroundColor: selectedDoctor.name == 'Dr. Sohail' ? Theme.of(context).colorScheme.secondaryContainer : Theme.of(context).colorScheme.onSecondary,
-                            onDeleted: () => setState(() {
-                              selectedDoctor = d1;
-                            }),
-                            deleteIcon: selectedDoctor.name == 'Dr. Sohail' ? Icon(Icons.check) : Icon(Icons.circle_outlined),
-                          ),
-                          Spacer(),
+                          CircularProgressIndicator(),
                           const SizedBox(
-                            width: 10,
+                            height: 20,
                           ),
-                          Chip(
-                            label: Text('Haseeb'),
-                            backgroundColor: selectedDoctor.name == 'Haseeb' ? Theme.of(context).colorScheme.secondaryContainer : Theme.of(context).colorScheme.onSecondary,
-                            onDeleted: () {
-                              setState(() {
-                                selectedDoctor = d2;
-                              });
-                            },
-                            deleteIcon: selectedDoctor.name == 'Haseeb' ? Icon(Icons.check) : Icon(Icons.circle_outlined),
+                          Text(
+                            'This App is too fast...',
+                            style: TextStyle(fontSize: 17),
                           ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'slowed down by Haseeb ',
+                                style: TextStyle(fontSize: 17),
+                              ),
+                              Text(
+                                '😉',
+                                style: TextStyle(fontSize: 21, color: Colors.red),
+                              ),
+                            ],
+                          )
                         ],
-                      ),
-                    ),
-                  ],
+                      )),
                 ),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                ),
-              ),
-            ),
-            ListTile(
-              title: const Text('Dark Mode'),
-              trailing: Icon(
-                widget.useLightMode ? Icons.dark_mode : Icons.light_mode,
-              ),
-              onTap: () {
-                widget.handleBrightnessChange();
-              },
-            ),
-            ListTile(
-              title: const Text('About Project'),
-              trailing: Icon(Icons.info_outline),
-              onTap: () {
-                // https://github.com/HaseebKahn365/s_sohail_hospital
-                launchUrl(Uri.parse('https://github.com/HaseebKahn365/s_sohail'));
-              },
-            ),
-          ],
-        ),
-      ),
+              )
+            : Scaffold(
+                //creating a simple drawer for theme setting and about me page
+                drawer: Drawer(
+                  elevation: 0,
+                  child: ListView(
+                    // increase the height of the drawer header
+                    children: <Widget>[
+                      SizedBox(
+                        height: 350,
+                        child: DrawerHeader(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            children: [
+                              //circle avatar for the profile picture
+                              CircleAvatar(
+                                radius: 65,
+                                backgroundImage: (selectedDoctor.name == 'Dr. Sohail') ? AssetImage('assets/sir.png') : AssetImage('assets/profile.png'),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                selectedDoctor.name,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                ),
+                              ),
+                              const Text(
+                                'Doctor of S. Sohail Hospital',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                ),
+                              ),
 
-      appBar: AppBar(
-        //increase the size of the app bar
-        toolbarHeight: 85,
-        centerTitle: true,
-        title: const Text('S. Sohail Hospital'),
-        //adding an action to toggle the theme
-        actions: <Widget>[
-          //adding an exclamation icon button that launches the about me page
-        ],
-      ),
-      //List view for widgets
-      body: ListView(
-        //make widget occupy min space
-        shrinkWrap: true,
+                              //here we will create 3 chips for 3 different doctors we can select the doctor and make it the selected doctor
 
-        children: [
-          //create an add patient button
-          Column(
-            children: [
-              //create a search bar using a text field
-              SizedBox(
-                width: 250,
-                child: TextField(
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.all(15),
-                    hintText: '           Search',
-                    prefixIcon: Padding(
-                      padding: const EdgeInsets.only(left: 20.0, right: 10),
-                      child: Icon(Icons.search),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                  ),
-                ),
-              ),
-              //list tiles for patients
-              ...hospitalSystemObject.patients.map((e) {
-                //parse time from epoch milliseconds
-                final tempDateTime = DateTime.fromMillisecondsSinceEpoch(int.parse(e.admittedOn));
-                return Padding(
-                  padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-                  child: Card(
-                    child: ListTile(
-                      //rounded corners for the list tiles
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-
-                      title: Padding(
-                        padding: const EdgeInsets.only(bottom: 10.0),
-                        child: Text(e.name),
-                      ),
-                      subtitle: Text("${tempDateTime.day} / ${tempDateTime.month} / ${tempDateTime.year}  at ${'${tempDateTime.hour < 10 ? '0' : ''}${tempDateTime.hour}:${tempDateTime.minute < 10 ? '0' : ''}${tempDateTime.minute}${tempDateTime.hour < 12 ? ' AM' : ' PM'}'}"),
-                      onTap: () {
-                        //Navigate to the patient screen
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PatientScreen(
-                              patient: e,
-                              selectedDoctor: selectedDoctor,
-                              hospitalSystem: hospitalSystemObject,
-                            ),
+                              Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    //creating a simple chip for the doctor
+                                    Chip(
+                                      label: Text('Dr. Sohail'),
+                                      backgroundColor: selectedDoctor.name == 'Dr. Sohail' ? Theme.of(context).colorScheme.secondaryContainer : Theme.of(context).colorScheme.onSecondary,
+                                      onDeleted: () => setState(() {
+                                        selectedDoctor = d1;
+                                      }),
+                                      deleteIcon: selectedDoctor.name == 'Dr. Sohail' ? Icon(Icons.check) : Icon(Icons.circle_outlined),
+                                    ),
+                                    Spacer(),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Chip(
+                                      label: Text('Haseeb'),
+                                      backgroundColor: selectedDoctor.name == 'Haseeb' ? Theme.of(context).colorScheme.secondaryContainer : Theme.of(context).colorScheme.onSecondary,
+                                      onDeleted: () {
+                                        setState(() {
+                                          selectedDoctor = d2;
+                                        });
+                                      },
+                                      deleteIcon: selectedDoctor.name == 'Haseeb' ? Icon(Icons.check) : Icon(Icons.circle_outlined),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                        );
-                      },
-                    ),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                        ),
+                      ),
+                      ListTile(
+                        title: const Text('Dark Mode'),
+                        trailing: Icon(
+                          widget.useLightMode ? Icons.dark_mode : Icons.light_mode,
+                        ),
+                        onTap: () {
+                          widget.handleBrightnessChange();
+                        },
+                      ),
+                      ListTile(
+                        title: const Text('About Project'),
+                        trailing: Icon(Icons.info_outline),
+                        onTap: () {
+                          // https://github.com/HaseebKahn365/s_sohail_hospital
+                          launchUrl(Uri.parse('https://github.com/HaseebKahn365/s_sohail'));
+                        },
+                      ),
+                    ],
                   ),
-                );
-              }).toList(),
-            ],
-          )
-        ],
-      ),
-      floatingActionButton: SizedBox(
-        width: 130,
-        child: FloatingActionButton(
-          onPressed: () async {
-            // await hospitalSystemObject.deleteEntireDatabase();
-            // Add your onPressed code here!
-            // date should be string epoch value
-            // String tempnow = DateTime.now().millisecondsSinceEpoch.toString();
-            // await patientService.open();
-            // DatabasePatient p1 = await patientService.createPatient(name: 'Abdul Haseeb', admittedOn: tempnow);
-            // //creating a doctor
-            // DatabaseDoctor d1 = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
-            // d1.createDoctor(name: 'Dr. dsfa', specialization: 'General Physician');
-            // //creating a visit
-            // DatabaseVisit v1 = DatabaseVisit(diagnosis: 'Fever', amount: 365, visitDate: tempnow, docId: d1.id, userId: p1.id, id: 1);
-            // v1.createVisit(diagnosis: 'Fever', amount: 365, visitDate: tempnow, docId: d1.id, userId: p1.id);
+                ),
 
-            // // patientService.deleteAllDb();
-            // DatabaseDoctor d1 = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
-            // d1.createDoctor(name: 'Dr. dsfa', specialization: 'General Physician');
-            // //creating a doctor object and adding to the table
-            // DatabaseDoctor d2 = DatabaseDoctor(name: 'Dr. Haseeb', specialization: 'General Surgeon', id: 2);
-            //creating a visit
-
-            //show and alert dialogue box asking for the patient name and then add the patient to the list
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                TextEditingController _textFieldController = TextEditingController();
-                String tempName = '';
-                return AlertDialog(
-                  title: const Text('Add Patient'),
-                  content: TextField(
-                    decoration: const InputDecoration(hintText: 'Enter Patient Name'),
-                    controller: _textFieldController,
-                  ),
+                appBar: AppBar(
+                  //increase the size of the app bar
+                  toolbarHeight: 85,
+                  centerTitle: true,
+                  title: const Text('S. Sohail Hospital'),
+                  //adding an action to toggle the theme
                   actions: <Widget>[
-                    TextButton(
-                      onPressed: () async {
-                        //add the patient to the list
-                        tempName = _textFieldController.text;
-                        RegExp regExp = RegExp(r'^[a-zA-Z0-9\(\)\p{Emoji}]+$', unicode: true);
-                        if (tempName != '' && regExp.hasMatch(tempName) && tempName.length >= 3) {
-                          //must contain at least 3 alphabets
-
-                          hospitalSystemObject.addNewPatient(tempName);
-                          //if text is "haseeb365" then delele the entire database
-                          if (tempName == 'haseeb365') {
-                            await hospitalSystemObject.deleteEntireDatabase();
-                          }
-                          bigFuture();
-                          Navigator.of(context).pop();
-                        } else {
-                          //show a snackbar
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Invalid Name'),
-                              duration: Duration(seconds: 1),
-                            ),
-                          );
-                        }
-                      },
-                      child: const Text('Add'),
-                    ),
+                    //adding an exclamation icon button that launches the about me page
                   ],
-                );
-              },
-            );
-          },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Icon(Icons.medical_services), // replace with your icon
-              Text('  Add Patient'),
-            ],
-          ),
-        ),
-      ),
-    );
+                ),
+                //List view for widgets
+                body: ListView(
+                  //make widget occupy min space
+                  shrinkWrap: true,
+
+                  children: [
+                    //create an add patient button
+                    Column(
+                      children: [
+                        //create a search bar using a text field
+                        SizedBox(
+                          width: 250,
+                          child: TextField(
+                            controller: searchTermController,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.all(15),
+                              hintText: '           Search',
+                              prefixIcon: Padding(
+                                padding: const EdgeInsets.only(left: 20.0, right: 10),
+                                child: Icon(Icons.search),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                            ),
+                            onChanged: (value) {
+                              getNewPatients(value);
+                            },
+                          ),
+                        ),
+                        //list tiles for patients
+                        //displayed patients are only those that are affected by the search term
+                        ...displayedPatients.map((e) {
+                          //parse time from epoch milliseconds
+                          final tempDateTime = DateTime.fromMillisecondsSinceEpoch(int.parse(e.admittedOn));
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+                            child: Card(
+                              child: ListTile(
+                                //rounded corners for the list tiles
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+
+                                title: Padding(
+                                  padding: const EdgeInsets.only(bottom: 10.0),
+                                  child: Text(e.name),
+                                ),
+                                subtitle: Text("${tempDateTime.day} / ${tempDateTime.month} / ${tempDateTime.year}  at ${'${tempDateTime.hour < 10 ? '0' : ''}${tempDateTime.hour}:${tempDateTime.minute < 10 ? '0' : ''}${tempDateTime.minute}${tempDateTime.hour < 12 ? ' AM' : ' PM'}'}"),
+                                onTap: () {
+                                  //Navigate to the patient screen
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PatientScreen(
+                                        patient: e,
+                                        selectedDoctor: selectedDoctor,
+                                        hospitalSystem: hospitalSystemObject,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ).animate(
+                            effects: [
+                              //animate the list tiles
+                              FadeEffect(
+                                duration: Duration(milliseconds: 500),
+                                delay: Duration(milliseconds: 100 * displayedPatients.indexOf(e)),
+                              )
+                            ],
+                          );
+                        }).toList(),
+                      ],
+                    )
+                  ],
+                ),
+                floatingActionButton: SizedBox(
+                  width: 130,
+                  child: FloatingActionButton(
+                    onPressed: () async {
+                      // await hospitalSystemObject.deleteEntireDatabase();
+                      // Add your onPressed code here!
+                      // date should be string epoch value
+                      // String tempnow = DateTime.now().millisecondsSinceEpoch.toString();
+                      // await patientService.open();
+                      // DatabasePatient p1 = await patientService.createPatient(name: 'Abdul Haseeb', admittedOn: tempnow);
+                      // //creating a doctor
+                      // DatabaseDoctor d1 = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
+                      // d1.createDoctor(name: 'Dr. dsfa', specialization: 'General Physician');
+                      // //creating a visit
+                      // DatabaseVisit v1 = DatabaseVisit(diagnosis: 'Fever', amount: 365, visitDate: tempnow, docId: d1.id, userId: p1.id, id: 1);
+                      // v1.createVisit(diagnosis: 'Fever', amount: 365, visitDate: tempnow, docId: d1.id, userId: p1.id);
+
+                      // // patientService.deleteAllDb();
+                      // DatabaseDoctor d1 = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
+                      // d1.createDoctor(name: 'Dr. dsfa', specialization: 'General Physician');
+                      // //creating a doctor object and adding to the table
+                      // DatabaseDoctor d2 = DatabaseDoctor(name: 'Dr. Haseeb', specialization: 'General Surgeon', id: 2);
+                      //creating a visit
+
+                      //show and alert dialogue box asking for the patient name and then add the patient to the list
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          TextEditingController _textFieldController = TextEditingController();
+                          String tempName = '';
+                          return AlertDialog(
+                            title: const Text('Add Patient'),
+                            content: TextField(
+                              decoration: const InputDecoration(hintText: 'Enter Patient Name'),
+                              controller: _textFieldController,
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () async {
+                                  //add the patient to the list
+                                  tempName = _textFieldController.text;
+                                  RegExp regExp = RegExp(r'^[a-zA-Z0-9\(\)\p{Emoji}]+$', unicode: true);
+                                  if (tempName != '' && regExp.hasMatch(tempName) && tempName.length >= 2) {
+                                    //must contain at least 3 alphabets
+
+                                    hospitalSystemObject.addNewPatient(tempName);
+                                    //if text is "haseeb365" then delele the entire database
+                                    if (tempName == 'haseeb365') {
+                                      await hospitalSystemObject.deleteEntireDatabase();
+                                    }
+                                    bigFuture();
+                                    Navigator.of(context).pop();
+                                  } else {
+                                    //show a snackbar
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Invalid Name'),
+                                        duration: Duration(seconds: 1),
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: const Text('Add'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(Icons.medical_services), // replace with your icon
+                        Text('  Add Patient'),
+                      ],
+                    ),
+                  ),
+                ),
+              );
   }
 }

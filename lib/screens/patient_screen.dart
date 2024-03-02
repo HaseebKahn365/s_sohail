@@ -85,8 +85,8 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
             title: Text('Admitted on: ${newDate.day}/${newDate.month}/${newDate.year} at ${newDate.hour > 12 ? newDate.hour - 12 : newDate.hour}:${newDate.minute} ${newDate.hour > 12 ? 'PM' : 'AM'} '),
             //total visits
             subtitle: Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: Text('Total visits: ${visits.length}'),
+              padding: const EdgeInsets.only(top: 13.0, bottom: 8),
+              child: Text('Total Appointments: ${visits.length}'),
             ),
           ),
           const Divider(),
@@ -187,7 +187,7 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
                 ),
               ),
               ListTile(
-                title: Text('Father Name: '),
+                title: Text('Father Name: Nade Zaroori'),
               ),
             ],
           ),
@@ -216,14 +216,19 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
             ],
           ),
           ExpansionTile(
-            title: Text('Bill'),
+            title: Text(
+              'Bill',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             children: [
               Consumer(
                 builder: (context, watch, child) {
                   // final visits = watch(patientProvider(widget.patient).select((value) => value.visits));
                   return ListTile(
                     title: Text('Total bill: ${visits.fold(0, (previousValue, element) => previousValue + element.amount)}'),
-                    subtitle: Text('Number of visits: ${visits.length}'),
+                    subtitle: Text('Number of Appointments: ${visits.length}'),
                     trailing: ElevatedButton(
                       onPressed: () {
                         bool isPayedByInsurance = false;
