@@ -70,4 +70,17 @@ class HospitalSystem extends ChangeNotifier {
     _visits.add(newVisit);
     notifyListeners();
   }
+
+  Future<void> addNewDoctor(String name, String specialization) async {
+    final DatabaseDoctor newDoctor = DatabaseDoctor(id: _doctors.length + 1, name: name, specialization: specialization);
+    await _tempDoctor.createDoctor(name: name, specialization: specialization);
+    _doctors.add(newDoctor);
+    notifyListeners();
+  }
+
+  //update the visit
+  Future<void> updateVisit(DatabaseVisit visit, int amount) async {
+    visit.updateVisit(amount: amount, diagnosis: visit.diagnosis, docId: visit.docId, id: visit.id, userId: visit.userId, visitDate: visit.visitDate);
+    notifyListeners();
+  }
 }

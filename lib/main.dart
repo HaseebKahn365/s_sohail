@@ -149,16 +149,30 @@ class _HomeScreenState extends State<HomeScreen> {
     // patientService = PatientService();
     // patientService.open();
     bigFuture();
+    print('Creating a doctor');
   }
+
+  DatabaseDoctor d1 = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
+  DatabaseDoctor d2 = DatabaseDoctor(name: 'Haseeb', specialization: 'General Surgeon', id: 2);
+
+  //creating a selected Doctor
+  late DatabaseDoctor selectedDoctor;
 
   Future<void> bigFuture() async {
     await hospitalSystemObject.initDatabase();
-    setState(() {});
 
     print('Database initialized');
     print(hospitalSystemObject.patients);
     print(hospitalSystemObject.visits);
     print(hospitalSystemObject.doctors);
+    if (hospitalSystemObject.doctors.isEmpty) {
+      await d1.createDoctor(name: 'Dr. Sohail', specialization: 'General Physician');
+      await d2.createDoctor(name: 'Haseeb', specialization: 'General Surgeon');
+    } else {
+      selectedDoctor = d1;
+      print("selected doctor: $selectedDoctor");
+    }
+    setState(() {});
   }
 
   @override
@@ -171,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // increase the height of the drawer header
           children: <Widget>[
             SizedBox(
-              height: 250,
+              height: 350,
               child: DrawerHeader(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -179,10 +193,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     //circle avatar for the profile picture
                     CircleAvatar(
                       radius: 65,
-                      backgroundImage: AssetImage('assets/profile.png'),
+                      backgroundImage: (selectedDoctor.name == 'Dr. Sohail') ? AssetImage('assets/sir.png') : AssetImage('assets/profile.png'),
                     ),
-                    const Text(
-                      'Abdul Haseeb',
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      selectedDoctor.name,
                       style: TextStyle(
                         fontSize: 20,
                       ),
@@ -191,6 +208,40 @@ class _HomeScreenState extends State<HomeScreen> {
                       'Doctor of S. Sohail Hospital',
                       style: TextStyle(
                         fontSize: 16,
+                      ),
+                    ),
+
+                    //here we will create 3 chips for 3 different doctors we can select the doctor and make it the selected doctor
+
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          //creating a simple chip for the doctor
+                          Chip(
+                            label: Text('Dr. Sohail'),
+                            backgroundColor: selectedDoctor.name == 'Dr. Sohail' ? Theme.of(context).colorScheme.secondaryContainer : Theme.of(context).colorScheme.onSecondary,
+                            onDeleted: () => setState(() {
+                              selectedDoctor = d1;
+                            }),
+                            deleteIcon: selectedDoctor.name == 'Dr. Sohail' ? Icon(Icons.check) : Icon(Icons.circle_outlined),
+                          ),
+                          Spacer(),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Chip(
+                            label: Text('Haseeb'),
+                            backgroundColor: selectedDoctor.name == 'Haseeb' ? Theme.of(context).colorScheme.secondaryContainer : Theme.of(context).colorScheme.onSecondary,
+                            onDeleted: () {
+                              setState(() {
+                                selectedDoctor = d2;
+                              });
+                            },
+                            deleteIcon: selectedDoctor.name == 'Haseeb' ? Icon(Icons.check) : Icon(Icons.circle_outlined),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -274,7 +325,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: const EdgeInsets.only(bottom: 10.0),
                         child: Text(e.name),
                       ),
-                      subtitle: Text("${tempDateTime.day} / ${tempDateTime.month} / ${tempDateTime.year}  at ${(tempDateTime.hour < 10 ? '0' : '') + tempDateTime.hour.toString() + ':' + (tempDateTime.minute < 10 ? '0' : '') + tempDateTime.minute.toString() + (tempDateTime.hour < 12 ? ' AM' : ' PM')}"),
+                      subtitle: Text("${tempDateTime.day} / ${tempDateTime.month} / ${tempDateTime.year}  at ${'${tempDateTime.hour < 10 ? '0' : ''}${tempDateTime.hour}:${tempDateTime.minute < 10 ? '0' : ''}${tempDateTime.minute}${tempDateTime.hour < 12 ? ' AM' : ' PM'}'}"),
                       onTap: () {
                         //Navigate to the patient screen
                         Navigator.push(
@@ -282,6 +333,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           MaterialPageRoute(
                             builder: (context) => PatientScreen(
                               patient: e,
+                              selectedDoctor: selectedDoctor,
                               hospitalSystem: hospitalSystemObject,
                             ),
                           ),

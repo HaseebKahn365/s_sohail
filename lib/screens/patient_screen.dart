@@ -18,15 +18,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:s_sohail/classes_and_vars/buisiness_logic_and_classes.dart';
 
-import 'package:s_sohail/classes_and_vars/temp_ui_classes.dart';
 import 'package:s_sohail/services/hospital_services.dart';
-import 'package:sqflite/sqflite.dart';
 
 class PatientScreen extends ConsumerStatefulWidget {
   final DatabasePatient patient;
   final HospitalSystem hospitalSystem;
+  final DatabaseDoctor selectedDoctor;
 
-  const PatientScreen({Key? key, required this.patient, required this.hospitalSystem}) : super(key: key);
+  const PatientScreen({Key? key, required this.patient, required this.hospitalSystem, required this.selectedDoctor}) : super(key: key);
 
   @override
   _PatientScreenState createState() => _PatientScreenState();
@@ -49,7 +48,6 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
 
   void getMyVisits() {
     visits = widget.hospitalSystem.visits.where((visit) => visit.userId == widget.patient.id).toList();
-    setState(() {});
   }
 
   bool isEmergency = false;
@@ -148,7 +146,21 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
               keyboardType: TextInputType.number,
             ),
             trailing: ElevatedButton(
-              onPressed: () {},
+              onPressed: () async {
+                //check if the diagnosis and amount is not empty
+                if (diagnosisController.text.isNotEmpty && amountController.text.isNotEmpty) {
+                  //add the visit to the history
+                  widget.hospitalSystem.addNewVisit(diagnosisController.text, int.parse(amountController.text), widget.patient.id, widget.selectedDoctor.id);
+                  //clear the text fields
+                  diagnosisController.clear();
+                  amountController.clear();
+                  await widget.hospitalSystem.initDatabase();
+                  setState(() {
+                    getMyVisits();
+                  });
+                  //get the visits
+                }
+              },
               child: Text('Update'),
             ),
           ),
@@ -185,11 +197,11 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
                   return Column(
                     children: visits.map((visit) {
                       return ListTile(
-                        title: Text('Diagnosis: ${visit.diagnosis}'),
-                        subtitle: Text(
-                          'Amount charged: ${visit.amount}',
-                        ),
-                      );
+                          title: Text('Diagnosis: ${visit.diagnosis}'),
+                          subtitle: Text(
+                            'Amount charged: ${visit.amount}',
+                          ),
+                          trailing: Text("Consulted by: ${(visit.docId == 1) ? "Dr. Sohail" : "Haseeb"}"));
                     }).toList(),
                   );
                 },
@@ -203,7 +215,7 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
                 builder: (context, watch, child) {
                   // final visits = watch(patientProvider(widget.patient).select((value) => value.visits));
                   return ListTile(
-                    title: Text('Total bill: 199'),
+                    title: Text('Total bill: ${visits.fold(0, (previousValue, element) => previousValue + element.amount)}'),
                     subtitle: Text('Number of visits: ${visits.length}'),
                     trailing: ElevatedButton(
                       onPressed: () {
@@ -212,6 +224,7 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
                           context: context,
                           builder: (context) {
                             return StatefulBuilder(builder: (context, setState) {
+                              TextEditingController paymentcontroller = TextEditingController();
                               return AlertDialog(
                                 //center title
                                 title: Center(
@@ -291,6 +304,7 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
                                       child: TextField(
                                         //TODO add  controller
                                         textAlign: TextAlign.center,
+                                        controller: paymentcontroller,
                                         decoration: InputDecoration(
                                           hintText: 'Rs.',
                                           contentPadding: EdgeInsets.all(10),
@@ -308,7 +322,24 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
                                 ),
                                 actions: [
                                   ElevatedButton(
-                                    onPressed: () {
+                                    onPressed: () async {
+                                      //go through the entire list of visits and keep on subtracting the amount from amount of each visit then update the database
+                                      int totalAmount = int.parse(paymentcontroller.text);
+                                      print("Total amount: $totalAmount");
+                                      for (var visit in visits) {
+                                        if (totalAmount > 0) {
+                                          if (totalAmount >= visit.amount) {
+                                            totalAmount -= visit.amount;
+                                            visit.updateVisit(amount: 0, diagnosis: visit.diagnosis, docId: visit.docId, id: visit.id, userId: visit.userId, visitDate: visit.visitDate);
+                                          } else {
+                                            visit.updateVisit(amount: visit.amount - totalAmount, diagnosis: visit.diagnosis, docId: visit.docId, id: visit.id, userId: visit.userId, visitDate: visit.visitDate);
+                                            totalAmount = 0;
+                                          }
+                                        }
+                                      }
+                                      setState(() {
+                                        getMyVisits();
+                                      });
                                       Navigator.pop(context);
                                     },
                                     child: Text('Pay'),
