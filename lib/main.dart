@@ -19,6 +19,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:s_sohail/classes_and_vars/buisiness_logic_and_classes.dart';
+import 'package:s_sohail/screens/database_view.dart';
 import 'package:s_sohail/screens/patient_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -323,6 +324,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           launchUrl(Uri.parse('https://github.com/HaseebKahn365/s_sohail'));
                         },
                       ),
+
+                      //here we add another list tile for database table view screen, we will navigate there by material push route
+                      ListTile(
+                        title: const Text('Database Table View'),
+                        trailing: Icon(Icons.table_view),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DatabaseTableView(
+                                hospitalSystem: hospitalSystemObject,
+                              ),
+                            ),
+                          );
+                        },
+                      )
                     ],
                   ),
                 ),
