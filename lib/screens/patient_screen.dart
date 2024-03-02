@@ -46,6 +46,13 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
     getMyVisits();
   }
 
+  Future<void> refresh() async {
+    await widget.hospitalSystem.initDatabase();
+    setState(() {
+      getMyVisits();
+    });
+  }
+
   void getMyVisits() {
     visits = widget.hospitalSystem.visits.where((visit) => visit.userId == widget.patient.id).toList();
   }
@@ -337,9 +344,7 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
                                           }
                                         }
                                       }
-                                      setState(() {
-                                        getMyVisits();
-                                      });
+                                      await refresh();
                                       Navigator.pop(context);
                                     },
                                     child: Text('Pay'),

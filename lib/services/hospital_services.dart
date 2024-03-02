@@ -188,6 +188,8 @@ class DatabaseVisit {
   Future<void> updateVisit({required int id, required int amount, required String diagnosis, required int userId, required int docId, required String visitDate}) async {
     final db = _getDatabaseOrThrow();
     final updateCount = await db.update(visitTable, {amountColumn: amount, diagnosisColumn: diagnosis, userIdColumn: userId, docIdColumn: docId, visitDateColumn: visitDate}, where: '$idColumn = ?', whereArgs: [id]);
+    print('updated visit inside the db: $updateCount');
+    print('updated visit details: $id, $amount, $diagnosis, $userId, $docId, $visitDate');
     if (updateCount != 1) {
       throw 'Error updating visit';
     }
