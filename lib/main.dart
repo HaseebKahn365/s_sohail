@@ -16,6 +16,7 @@
 // Afterwards we have the bill section that will show the total bill for the patient and the number of visits. And on the right side we will have the Pay Bills button.
 // On tapping the pay Bills button an alert dialogue box shows up showing whether we want to pay bills using the insurance or direct method. The entered amount is deducted from the total bill.
 
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:s_sohail/classes_and_vars/buisiness_logic_and_classes.dart';
@@ -318,7 +319,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       ListTile(
                         title: const Text('About Project'),
-                        trailing: Icon(Icons.info_outline),
+                        trailing: Icon(
+                            //Clipboard Text Ltr
+                            FluentIcons.clipboard_text_ltr_24_regular),
                         onTap: () {
                           // https://github.com/HaseebKahn365/s_sohail_hospital
                           launchUrl(Uri.parse('https://github.com/HaseebKahn365/s_sohail'));
