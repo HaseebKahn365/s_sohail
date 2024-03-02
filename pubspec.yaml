@@ -41,6 +41,7 @@ dependencies:
   path: ^1.8.3
   path_provider: ^2.1.2
   flutter_animate: ^4.5.0
+  fluentui_system_icons: ^1.1.229
 
 dev_dependencies:
   flutter_test:

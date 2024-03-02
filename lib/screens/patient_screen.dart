@@ -1,6 +1,6 @@
 //this is a consumer stateful widget for the following purpose:
 
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 /*
 The Patient Screen:
@@ -13,6 +13,7 @@ On tapping the pay Bills button an alert dialogue box shows up showing whether w
 
  */
 
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -177,11 +178,23 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
           const Divider(),
           ExpansionTile(
             shape: RoundedRectangleBorder(),
-            title: Text(
-              'Details',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+            title: Row(
+              children: [
+                //details icon
+                Padding(
+                  padding: const EdgeInsets.only(right: 10.0, bottom: 5),
+                  child: Icon(
+                    FluentIcons.data_usage_edit_24_regular,
+                    size: 30,
+                  ),
+                ),
+                Text(
+                  'Details',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
             children: [
               ListTile(
@@ -198,7 +211,19 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
             //remove the border when the expansion tile is expanded
             shape: RoundedRectangleBorder(),
 
-            title: Text('History', style: TextStyle(fontWeight: FontWeight.bold)),
+            title: Row(
+              children: [
+                //history icon
+                Padding(
+                  padding: const EdgeInsets.only(right: 10.0, bottom: 5),
+                  child: Icon(
+                    FluentIcons.history_24_regular,
+                    size: 30,
+                  ),
+                ),
+                Text('History', style: TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
             children: [
               Consumer(
                 builder: (context, watch, child) {
@@ -227,11 +252,23 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
             ],
           ),
           ExpansionTile(
-            title: Text(
-              'Bill',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+            title: Row(
+              children: [
+                //credit card person icon
+                Padding(
+                  padding: const EdgeInsets.only(right: 10.0, bottom: 5),
+                  child: Icon(
+                    FluentIcons.credit_card_person_24_regular,
+                    size: 30,
+                  ),
+                ),
+                Text(
+                  'Bill',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
             children: [
               Consumer(
@@ -347,16 +384,32 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
                                         ElevatedButton(
                                           onPressed: () async {
                                             //go through the entire list of visits and keep on subtracting the amount from amount of each visit then update the database
-                                            int totalAmount = int.parse(paymentcontroller.text);
-                                            print("Total amount: $totalAmount");
+                                            int paymentAmount = int.parse(paymentcontroller.text);
+                                            int totalDues = visits.fold(0, (previousValue, element) => previousValue + element.amount);
+                                            print("Payments amount: $paymentAmount");
+                                            print("Total dues: $totalDues");
+                                            if (paymentAmount > totalDues) {
+                                              //show snalck bar that you have payed all the bills
+                                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                content: Row(
+                                                  children: [
+                                                    Text('You have payed all the bills\nTake back your ${paymentAmount - totalDues}     '),
+                                                    Padding(
+                                                      padding: const EdgeInsets.only(left: 20.0),
+                                                      child: Icon(Icons.check_circle, color: Theme.of(context).colorScheme.surface),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ));
+                                            }
                                             for (var visit in visits) {
-                                              if (totalAmount > 0) {
-                                                if (totalAmount >= visit.amount) {
-                                                  totalAmount -= visit.amount;
+                                              if (paymentAmount > 0) {
+                                                if (paymentAmount >= visit.amount) {
+                                                  paymentAmount -= visit.amount;
                                                   visit.updateVisit(amount: 0, diagnosis: visit.diagnosis, docId: visit.docId, id: visit.id, userId: visit.userId, visitDate: visit.visitDate);
                                                 } else {
-                                                  visit.updateVisit(amount: visit.amount - totalAmount, diagnosis: visit.diagnosis, docId: visit.docId, id: visit.id, userId: visit.userId, visitDate: visit.visitDate);
-                                                  totalAmount = 0;
+                                                  visit.updateVisit(amount: visit.amount - paymentAmount, diagnosis: visit.diagnosis, docId: visit.docId, id: visit.id, userId: visit.userId, visitDate: visit.visitDate);
+                                                  paymentAmount = 0;
                                                 }
                                               }
                                             }
