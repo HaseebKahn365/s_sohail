@@ -99,15 +99,6 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
                           widget.hospitalSystem.deletePatient(widget.patient.id);
 
                           Navigator.pop(context);
-                          Navigator.pop(context);
-                          //navigate using material route use pushReplacement to HomeScreen
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => HomeScreen(
-                                        handleBrightnessChange: () {},
-                                        useLightMode: true,
-                                      )));
                         },
                         child: Text('Yes'),
                       ),
