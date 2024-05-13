@@ -84,3 +84,97 @@ class HospitalSystem extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+
+//The following structure is a redesign of this buisiness logic. we will use the concepts of generalization, inheritance, and decomposition to make the code more modular and reusable.
+/*
+THe following structure describes the new dessign
+
+speaking of doctor there is a doctor class which has has children as ContractDoctor and PermanentDoctor
+the patient class has children as InPatient and OutPatient
+
+the aggregatioon of the hospital class is with the child classes of the patient class and the doctor class
+
+along with these classes there is a visit class which has a composition with the doctor and patient classes
+
+this above is the entire structure of the hospital system, now lets add the attributes and methods to these classes
+
+!Hospital class
+
+Attributes:
+- List<ContractDoctor> contractDoctors
+- List<PermanentDoctor> permanentDoctors
+- List<InPatient> inPatients
+- List<OutPatient> outPatients
+
+Methods:
+- addContractDoctor
+- addPermanentDoctor
+- addInPatient
+- addOutPatient
+
+!Doctor class
+
+Attributes:
+- int id
+- String name
+- String specialization
+
+Methods:
+- updateDoctor
+
+!ContractDoctor class
+
+Attributes:
+- int contractPeriod
+
+Methods:
+- updateContractDoctor
+
+!PermanentDoctor class
+
+Attributes:
+- int salary
+
+Methods:
+- updatePermanentDoctor
+
+!Patient class
+
+Attributes:
+- int id
+- String name
+
+Methods:
+- updatePatient
+
+!InPatient class
+
+Attributes:
+- DateTime admittedOn
+
+Methods:
+- updateInPatient
+
+!OutPatient class
+
+Attributes:
+- DateTime lastVisit
+
+Methods:
+- updateOutPatient
+
+!Visit class
+
+Attributes:
+- int id
+- String diagnosis
+- int amount
+- DateTime visitDate
+- Doctor doctor
+- Patient patient
+
+Methods:
+- updateVisit
+
+ */
