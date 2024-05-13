@@ -8,6 +8,7 @@ We are going to have a central Hospital System class that will be used for manag
  */
 
 import 'package:flutter/material.dart';
+import 'package:s_sohail/main.dart';
 import 'package:s_sohail/services/hospital_services.dart';
 
 class HospitalSystem extends ChangeNotifier {
@@ -36,6 +37,8 @@ class HospitalSystem extends ChangeNotifier {
     print("Got the visits");
     _doctors = await _tempDoctor.getAllDoctors();
     print("Got the doctors");
+    //here we are also going to get all the other doctors that are deletable
+    moreDoctors = await _tempDoctor.getMoreDoctors();
     notifyListeners();
   }
 

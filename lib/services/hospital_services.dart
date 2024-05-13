@@ -246,7 +246,23 @@ class DatabaseDoctor {
   //fetch all doctors
   Future<List<DatabaseDoctor>> getAllDoctors() async {
     final db = _getDatabaseOrThrow();
-    final results = await db.query(doctorTable);
+    //only getting the doctors with id 1 or 2
+    final results = await db.query(
+      doctorTable,
+      where: '$idColumn = ? OR $idColumn = ?', //sql-injection secure
+      whereArgs: [1, 2],
+    );
+    return results.map((e) => DatabaseDoctor.fromRow(e)).toList();
+  }
+
+  //method to getmore doctors besides the ones with id 1 and 2
+  Future<List<DatabaseDoctor>> getMoreDoctors() async {
+    final db = _getDatabaseOrThrow();
+    final results = await db.query(
+      doctorTable,
+      where: '$idColumn != ? AND $idColumn != ?', //sql-injection secure
+      whereArgs: [1, 2],
+    );
     return results.map((e) => DatabaseDoctor.fromRow(e)).toList();
   }
 

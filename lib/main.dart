@@ -141,6 +141,8 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+List<DatabaseDoctor> moreDoctors = []; //these are deletable doctors
+
 class _HomeScreenState extends State<HomeScreen> {
   //creating a hospital system object
   final HospitalSystem hospitalSystemObject = HospitalSystem();
@@ -163,6 +165,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   //creating a selected Doctor
   late DatabaseDoctor selectedDoctor;
+
+  //list for special Doctors
 
   Future<void> bigFuture() async {
     await hospitalSystemObject.initDatabase();
