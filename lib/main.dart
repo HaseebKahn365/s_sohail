@@ -158,6 +158,10 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void refresher() {
+    setState(() {});
+  }
+
   DatabaseDoctor d1 = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
   DatabaseDoctor d2 = DatabaseDoctor(name: 'Haseeb', specialization: 'General Surgeon', id: 2);
 
@@ -356,7 +360,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   title: const Text('S. Sohail Hospital'),
                   //adding an action to toggle the theme
                   actions: <Widget>[
-                    //adding an exclamation icon button that launches the about me page
+                    //add a refresh button
+                    IconButton(
+                      icon: Icon(Icons.refresh),
+                      onPressed: () {
+                        refresher();
+                      },
+                    ),
                   ],
                 ),
                 //List view for widgets
