@@ -1,0 +1,137 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "Code tour of Sir Sohail Hospital",
+  "steps": [
+    {
+      "file": "lib/main.dart",
+      "description": "Provider Scope is as part of the state managemenent solution called RiverPod but later on i did not use it that much and found myself stuck to the typical stateful widgets",
+      "line": 17
+    },
+    {
+      "file": "lib/main.dart",
+      "description": "This is the main widget for the application. It is a stateful widget that\r\ncontains all the essential widgets for the application.\r\n ",
+      "line": 25
+    },
+    {
+      "file": "lib/main.dart",
+      "description": "methods to update the interface ie. theme",
+      "line": 71
+    },
+    {
+      "file": "lib/main.dart",
+      "description": "this is the widget where the interface begins all the ui elements are here",
+      "line": 114
+    },
+    {
+      "file": "lib/main.dart",
+      "description": "the init is called when page is created it calls the bigFuture. lets see what we got in big future",
+      "line": 132
+    },
+    {
+      "file": "lib/main.dart",
+      "description": "we are loading the essentail data to the ram from the HospitalService instance.\r\nlets visit the HospitalService class and see what is happening there.",
+      "line": 157
+    },
+    {
+      "file": "lib/classes_and_vars/buisiness_logic_and_classes.dart",
+      "description": "This is the intermediary between the interface and the database.\r\nthis class contains sub classes that are responsible for the database operations.\r\n ",
+      "line": 13
+    },
+    {
+      "file": "lib/classes_and_vars/buisiness_logic_and_classes.dart",
+      "description": "getters to access the patients and other objects\r\n",
+      "line": 22
+    },
+    {
+      "file": "lib/classes_and_vars/buisiness_logic_and_classes.dart",
+      "description": "This is where the database services are initiated\r\ncode is pretty self explanatory\r\n",
+      "line": 31
+    },
+    {
+      "file": "lib/classes_and_vars/buisiness_logic_and_classes.dart",
+      "description": "we are not only deleting from the db but also clearing the record from the list",
+      "line": 61
+    },
+    {
+      "file": "lib/services/hospital_services.dart",
+      "description": "this is the trigger that is used to create a deletedPatients table if it does not exist\r\notherwise it will use the trigger to make sure that the deleted patient is added to the deletedpatients before it is deleted from the patients table",
+      "line": 64
+    },
+    {
+      "file": "lib/services/hospital_services.dart",
+      "description": "these tables are created in case if they don't exist\r\n\r\nthis is assured at the initstate of the home page\r\n\r\n",
+      "line": 104
+    },
+    {
+      "file": "lib/services/hospital_services.dart",
+      "description": "this is how i am storing the patient's data for the application",
+      "line": 176
+    },
+    {
+      "file": "lib/services/hospital_services.dart",
+      "description": "this is aboout the visit",
+      "line": 205
+    },
+    {
+      "file": "lib/services/hospital_services.dart",
+      "description": "this is the info about the doctor",
+      "line": 274
+    },
+    {
+      "file": "lib/main.dart",
+      "description": "we are displaying the silly message only on the first startup",
+      "line": 194
+    },
+    {
+      "file": "lib/main.dart",
+      "description": "this is where the drawer and the body of the app is",
+      "line": 227
+    },
+    {
+      "file": "lib/main.dart",
+      "description": "this is what the FAB button does when pressed",
+      "line": 475
+    },
+    {
+      "file": "lib/main.dart",
+      "description": "displaying the proper profile picture based on the selected doctor\r\n",
+      "line": 241
+    },
+    {
+      "file": "lib/main.dart",
+      "description": "launching github",
+      "line": 317
+    },
+    {
+      "file": "lib/main.dart",
+      "description": "visiting the database tables on a separate screen",
+      "line": 323
+    },
+    {
+      "file": "lib/screens/database_view.dart",
+      "description": "This is the screen to display the tables",
+      "line": 15
+    },
+    {
+      "file": "lib/screens/database_view.dart",
+      "description": "go through all the all the patients list in the hospitalsystem and display the data for each patient",
+      "line": 79
+    },
+    {
+      "file": "lib/screens/database_view.dart",
+      "description": "displaying the visit details from the list using getter from the hospital system instance",
+      "line": 163
+    },
+    {
+      "file": "lib/screens/database_view.dart",
+      "description": "change the color of the patient id to red in case of it not found in the list ie. -1 then show the red color",
+      "line": 166
+    },
+    {
+      "file": "lib/screens/database_view.dart",
+      "description": "displaying all the deleted patients\r\n",
+      "line": 267
+    }
+  ],
+  "ref": "main"
+}
