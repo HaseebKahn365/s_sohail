@@ -164,8 +164,6 @@ class _HomeScreenState extends State<HomeScreen> {
   //creating a selected Doctor
   DatabaseDoctor selectedDoctor = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
 
-  //method to refresh the screen
-
   //list for special Doctors
 
   Future<void> bigFuture() async {
@@ -201,15 +199,10 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchTermController = TextEditingController();
   bool isFirstTime = true;
 
-  void RefreshTheScreen() {
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return
         //if first time display a circular progress indicator with 2 seconds delay
-
         (isFirstTime)
             ? Scaffold(
                 body: Center(
@@ -454,107 +447,83 @@ class _HomeScreenState extends State<HomeScreen> {
                     )
                   ],
                 ),
-                floatingActionButton: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    //add another floating action button for refreshing the screen
-                    SizedBox(
-                      width: 130,
-                      child: FloatingActionButton(
-                        onPressed: () {
-                          RefreshTheScreen();
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Icon(Icons.refresh), // replace with your icon
-                            Text('  Refresh'),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    SizedBox(
-                      width: 130,
-                      child: FloatingActionButton(
-                        onPressed: () async {
-                          // await hospitalSystemObject.deleteEntireDatabase();
-                          // Add your onPressed code here!
-                          // date should be string epoch value
-                          // String tempnow = DateTime.now().millisecondsSinceEpoch.toString();
-                          // await patientService.open();
-                          // DatabasePatient p1 = await patientService.createPatient(name: 'Abdul Haseeb', admittedOn: tempnow);
-                          // //creating a doctor
-                          // DatabaseDoctor d1 = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
-                          // d1.createDoctor(name: 'Dr. dsfa', specialization: 'General Physician');
-                          // //creating a visit
-                          // DatabaseVisit v1 = DatabaseVisit(diagnosis: 'Fever', amount: 365, visitDate: tempnow, docId: d1.id, userId: p1.id, id: 1);
-                          // v1.createVisit(diagnosis: 'Fever', amount: 365, visitDate: tempnow, docId: d1.id, userId: p1.id);
+                floatingActionButton: SizedBox(
+                  width: 130,
+                  child: FloatingActionButton(
+                    onPressed: () async {
+                      // await hospitalSystemObject.deleteEntireDatabase();
+                      // Add your onPressed code here!
+                      // date should be string epoch value
+                      // String tempnow = DateTime.now().millisecondsSinceEpoch.toString();
+                      // await patientService.open();
+                      // DatabasePatient p1 = await patientService.createPatient(name: 'Abdul Haseeb', admittedOn: tempnow);
+                      // //creating a doctor
+                      // DatabaseDoctor d1 = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
+                      // d1.createDoctor(name: 'Dr. dsfa', specialization: 'General Physician');
+                      // //creating a visit
+                      // DatabaseVisit v1 = DatabaseVisit(diagnosis: 'Fever', amount: 365, visitDate: tempnow, docId: d1.id, userId: p1.id, id: 1);
+                      // v1.createVisit(diagnosis: 'Fever', amount: 365, visitDate: tempnow, docId: d1.id, userId: p1.id);
 
-                          // // patientService.deleteAllDb();
-                          // DatabaseDoctor d1 = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
-                          // d1.createDoctor(name: 'Dr. dsfa', specialization: 'General Physician');
-                          // //creating a doctor object and adding to the table
-                          // DatabaseDoctor d2 = DatabaseDoctor(name: 'Dr. Haseeb', specialization: 'General Surgeon', id: 2);
-                          //creating a visit
+                      // // patientService.deleteAllDb();
+                      // DatabaseDoctor d1 = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
+                      // d1.createDoctor(name: 'Dr. dsfa', specialization: 'General Physician');
+                      // //creating a doctor object and adding to the table
+                      // DatabaseDoctor d2 = DatabaseDoctor(name: 'Dr. Haseeb', specialization: 'General Surgeon', id: 2);
+                      //creating a visit
 
-                          //show and alert dialogue box asking for the patient name and then add the patient to the list
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              TextEditingController _textFieldController = TextEditingController();
-                              String tempName = '';
-                              return AlertDialog(
-                                title: const Text('Add Patient'),
-                                content: TextField(
-                                  decoration: const InputDecoration(hintText: 'Enter Patient Name'),
-                                  controller: _textFieldController,
-                                ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () async {
-                                      //add the patient to the list
-                                      tempName = _textFieldController.text;
-                                      RegExp regExp = RegExp(r'^[a-zA-Z0-9\(\)\p{Emoji}]+$', unicode: true);
-                                      if (tempName != '' && regExp.hasMatch(tempName) && tempName.length >= 2) {
-                                        //must contain at least 3 alphabets
+                      //show and alert dialogue box asking for the patient name and then add the patient to the list
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          TextEditingController _textFieldController = TextEditingController();
+                          String tempName = '';
+                          return AlertDialog(
+                            title: const Text('Add Patient'),
+                            content: TextField(
+                              decoration: const InputDecoration(hintText: 'Enter Patient Name'),
+                              controller: _textFieldController,
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () async {
+                                  //add the patient to the list
+                                  tempName = _textFieldController.text;
+                                  RegExp regExp = RegExp(r'^[a-zA-Z0-9\(\)\p{Emoji}]+$', unicode: true);
+                                  if (tempName != '' && regExp.hasMatch(tempName) && tempName.length >= 2) {
+                                    //must contain at least 3 alphabets
 
-                                        hospitalSystemObject.addNewPatient(tempName);
-                                        //if text is "haseeb365" then delele the entire database
-                                        if (tempName == 'haseeb365') {
-                                          await hospitalSystemObject.deleteEntireDatabase();
-                                        }
-                                        bigFuture();
-                                        Navigator.of(context).pop();
-                                      } else {
-                                        //show a snackbar
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Invalid Name'),
-                                            duration: Duration(seconds: 1),
-                                          ),
-                                        );
-                                      }
-                                    },
-                                    child: const Text('Add'),
-                                  ),
-                                ],
-                              );
-                            },
+                                    hospitalSystemObject.addNewPatient(tempName);
+                                    //if text is "haseeb365" then delele the entire database
+                                    if (tempName == 'haseeb365') {
+                                      await hospitalSystemObject.deleteEntireDatabase();
+                                    }
+                                    bigFuture();
+                                    Navigator.of(context).pop();
+                                  } else {
+                                    //show a snackbar
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Invalid Name'),
+                                        duration: Duration(seconds: 1),
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: const Text('Add'),
+                              ),
+                            ],
                           );
                         },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Icon(Icons.medical_services), // replace with your icon
-                            Text('  Add Patient'),
-                          ],
-                        ),
-                      ),
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(Icons.medical_services), // replace with your icon
+                        Text('  Add Patient'),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               );
   }

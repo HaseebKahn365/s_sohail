@@ -97,6 +97,7 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
                           widget.hospitalSystem.deletePatient(widget.patient.id);
 
                           Navigator.pop(context);
+                          Navigator.pop(context);
                         },
                         child: Text('Yes'),
                       ),
