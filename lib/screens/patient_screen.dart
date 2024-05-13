@@ -75,7 +75,7 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
     return Scaffold(
       appBar: AppBar(
         //increase the app bar size
-        toolbarHeight: 100,
+        toolbarHeight: 50,
         title: Text(widget.patient.name),
         centerTitle: true,
         actions: [
@@ -118,6 +118,21 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
       ),
       body: ListView(
         children: [
+          //in the center
+          /*CircleAvatar(
+                                  radius: 30,
+                                  backgroundImage: AssetImage('assets/${(e.id % 5) + 1}.jpg'),
+                                ), */
+
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Center(
+              child: CircleAvatar(
+                radius: 70,
+                backgroundImage: AssetImage('assets/${(widget.patient.id % 5) + 1}.jpg'),
+              ),
+            ),
+          ),
           ListTile(
             //showing time in 12 hours formate
             title: Text('Admitted on: ${newDate.day}/${newDate.month}/${newDate.year} at ${newDate.hour > 12 ? newDate.hour - 12 : newDate.hour}:${newDate.minute} ${newDate.hour > 12 ? 'PM' : 'AM'} '),
