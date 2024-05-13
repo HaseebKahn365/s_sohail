@@ -19,6 +19,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:s_sohail/classes_and_vars/buisiness_logic_and_classes.dart';
+import 'package:s_sohail/main.dart';
 
 import 'package:s_sohail/services/hospital_services.dart';
 
@@ -79,6 +80,51 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
         toolbarHeight: 100,
         title: Text(widget.patient.name),
         centerTitle: true,
+        actions: [
+          //adding a delete button
+          IconButton(
+            onPressed: () async {
+              //showing a dialog box to confirm the deletion
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text('Delete Patient'),
+                    content: Text('Are you sure you want to delete the patient?'),
+                    actions: [
+                      ElevatedButton(
+                        onPressed: () {
+                          //deleting the patient
+                          //we will temporarily delete the patient and we will have the option to revert the changes
+                          widget.hospitalSystem.deletePatient(widget.patient.id);
+
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                          //navigate using material route use pushReplacement to HomeScreen
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomeScreen(
+                                        handleBrightnessChange: () {},
+                                        useLightMode: true,
+                                      )));
+                        },
+                        child: Text('Yes'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text('No'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            icon: Icon(Icons.delete),
+          ),
+        ],
       ),
       body: ListView(
         children: [

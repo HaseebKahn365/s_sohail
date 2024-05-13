@@ -141,8 +141,6 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-List<DatabaseDoctor> moreDoctors = []; //these are deletable doctors
-
 class _HomeScreenState extends State<HomeScreen> {
   //creating a hospital system object
   final HospitalSystem hospitalSystemObject = HospitalSystem();
@@ -153,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // patientService.open();
     bigFuture();
     print('Creating a doctor');
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(Duration(seconds: 1), () {
       setState(() {
         isFirstTime = false;
       });

@@ -23,7 +23,17 @@ CREATE TABLE `Doctor` (
 	`specialization`	TEXT NOT NULL
 );
 
+//creating a similar table for deleted doctors
+CREATE TABLE `DeletedDoctor` (
+  `id`	INTEGER NOT NULL PRIMARY KEY,
+  `name`	TEXT NOT NULL,
+  `specialization`	TEXT NOT NULL
+);
+
+
  */
+
+import 'dart:developer';
 
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -65,11 +75,57 @@ class PatientService {
     return createdPatient;
   }
 
-  Future<void> deletePatient(int id) async {
+  //! new methods added after update
+
+  //getting all the deleted patients
+  Future<List<DatabasePatient>> getDeletedPatients() async {
+    final db = _getDatabaseOrThrow();
+    final results = await db.query('DeletedPatient');
+    return results.map((e) => DatabasePatient.fromRow(e)).toList();
+  }
+
+  //delete patient with id
+  //  await _patientService.deletePatientWithID(id);
+
+  Future<void> deletePatientWithID(int id) async {
     final db = _getDatabaseOrThrow();
     final deleteCount = await db.delete(patientTable, where: '$idColumn = ?', whereArgs: [id]);
     if (deleteCount != 1) {
       throw 'Error deleting patient';
+    }
+  }
+
+  Future<void> createDeleteTriggerAndDelete() async {
+    final db = _getDatabaseOrThrow();
+    //create deleted patients table if not exists and also create trigger if not exists
+
+    try {
+      await db.execute('''
+      CREATE TABLE IF NOT EXISTS DeletedPatient (
+        $idColumn INTEGER NOT NULL PRIMARY KEY,
+        $nameColumn TEXT NOT NULL,
+        $admittedOnColumn TEXT NOT NULL
+      );
+      ''');
+
+      log('Created a new deleted patient table successfully');
+    } catch (e) {
+      log('Error creating deleted patient table: $e');
+    }
+
+    try {
+      await db.execute('''
+      CREATE TRIGGER IF NOT EXISTS delete_patient_trigger
+      AFTER DELETE ON $patientTable
+      BEGIN
+        INSERT INTO DeletedPatient ($idColumn, $nameColumn, $admittedOnColumn)
+        VALUES (OLD.$idColumn, OLD.$nameColumn, OLD.$admittedOnColumn);
+      END;
+      ''');
+
+      log('Created a new delete trigger successfully');
+    } catch (e) {
+      log('Error creating delete trigger: $e');
     }
   }
 
@@ -111,6 +167,18 @@ class PatientService {
           $specializationColumn TEXT NOT NULL
         );
         ''');
+
+        print("Creating new database for deleted doctors");
+
+        await db.execute('''
+        CREATE TABLE IF NOT EXISTS DeletedDoctor (
+          $idColumn INTEGER NOT NULL PRIMARY KEY,
+          $nameColumn TEXT NOT NULL,
+          $specializationColumn TEXT NOT NULL
+        );
+        ''');
+
+        log("Database created successfully");
       });
     } catch (e) {
       print(e);
@@ -255,15 +323,11 @@ class DatabaseDoctor {
     return results.map((e) => DatabaseDoctor.fromRow(e)).toList();
   }
 
-  //method to getmore doctors besides the ones with id 1 and 2
-  Future<List<DatabaseDoctor>> getMoreDoctors() async {
+  Future<void> checkNumber() async {
     final db = _getDatabaseOrThrow();
-    final results = await db.query(
-      doctorTable,
-      where: '$idColumn != ? AND $idColumn != ?', //sql-injection secure
-      whereArgs: [1, 2],
-    );
-    return results.map((e) => DatabaseDoctor.fromRow(e)).toList();
+    //use aggregate function count()
+    final results = await db.rawQuery('SELECT COUNT(*) FROM $doctorTable');
+    print('Number of doctors: ${results[0].values}');
   }
 
   //create doctor
@@ -280,17 +344,8 @@ class DatabaseDoctor {
     }
     final id = await db.insert(doctorTable, {nameColumn: name, specializationColumn: specialization});
     final dbDoctor = DatabaseDoctor(id: id, name: name, specialization: specialization);
-    print('created doctor inside the db: $dbDoctor');
+    log('created new doctor inside the db: $dbDoctor');
     return dbDoctor;
-  }
-
-  //delete doctor
-  Future<void> deleteDoctor(int id) async {
-    final db = _getDatabaseOrThrow();
-    final deleteCount = await db.delete(doctorTable, where: '$idColumn = ?', whereArgs: [id]);
-    if (deleteCount != 1) {
-      throw 'Error deleting doctor';
-    }
   }
 
   //named constructor for doctor from database row

@@ -164,7 +164,8 @@ class _TableViewDatabaseState extends State<DatabaseTableView> {
                                 DataCell(Text(visit.id.toString())),
                                 DataCell(Text(visit.amount.toString())),
                                 DataCell(Text(visit.diagnosis)),
-                                DataCell(Text(visit.userId.toString())),
+                                DataCell(Text(visit.userId.toString(), style: TextStyle(color: widget.hospitalSystem.patients.indexWhere((element) => element.id == visit.userId) == -1 ? Colors.red : Colors.black) // this is the patient id we should make it appear red in case if the patient is deleted in other words we can't find its id in the patients list
+                                    )), // this is the patient id we should make it appear red in case if the patient is deleted in other words we can't find its id in the patients list
                                 DataCell(Text(visit.docId.toString())),
                                 DataCell(Text(visit.visitDate)),
                               ]),
@@ -216,6 +217,58 @@ class _TableViewDatabaseState extends State<DatabaseTableView> {
                               DataCell(Text(doctor.id.toString())),
                               DataCell(Text(doctor.name)),
                               DataCell(Text(doctor.specialization)),
+                            ]),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  //creating a very similar table for the deleted Patients
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Text('Deleted Patients'),
+                  ),
+
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        headingRowHeight: 35,
+                        dataRowHeight: 35,
+                        columns: const <DataColumn>[
+                          DataColumn(
+                            label: Row(
+                              children: [
+                                //add an icon for primary keyy
+                                Padding(
+                                  padding: EdgeInsets.only(right: 8.0),
+                                  child: Icon(
+                                    FluentIcons.key_multiple_20_regular,
+                                    size: 15,
+                                  ),
+                                ),
+                                Text('ID'),
+                              ],
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text('Name'),
+                          ),
+                          DataColumn(
+                            label: Text('Admitted On'),
+                          ),
+                        ],
+                        rows: [
+                          // DataRow(cells: [DataCell(Text('1')), DataCell(Text('haseeb')), DataCell(Text('1709375481405'))])
+                          for (var patient in widget.hospitalSystem.deletedPatients)
+                            DataRow(cells: [
+                              DataCell(Text(patient.id.toString())),
+                              DataCell(Text(patient.name)),
+                              DataCell(Text(patient.admittedOn)),
                             ]),
                         ],
                       ),

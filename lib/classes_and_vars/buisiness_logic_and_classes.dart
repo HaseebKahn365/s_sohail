@@ -8,13 +8,13 @@ We are going to have a central Hospital System class that will be used for manag
  */
 
 import 'package:flutter/material.dart';
-import 'package:s_sohail/main.dart';
 import 'package:s_sohail/services/hospital_services.dart';
 
 class HospitalSystem extends ChangeNotifier {
   List<DatabasePatient> _patients = [];
   List<DatabaseVisit> _visits = [];
   List<DatabaseDoctor> _doctors = [];
+  List<DatabasePatient> deletedPatients = [];
 
   //getters for the data
   List<DatabasePatient> get patients => _patients;
@@ -37,8 +37,8 @@ class HospitalSystem extends ChangeNotifier {
     print("Got the visits");
     _doctors = await _tempDoctor.getAllDoctors();
     print("Got the doctors");
-    //here we are also going to get all the other doctors that are deletable
-    moreDoctors = await _tempDoctor.getMoreDoctors();
+
+    deletedPatients = await _patientService.getDeletedPatients();
     notifyListeners();
   }
 
@@ -53,6 +53,21 @@ class HospitalSystem extends ChangeNotifier {
     _patients = [];
     _visits = [];
     _doctors = [];
+    notifyListeners();
+  }
+
+  //deleting the patient with transactions so that we can revert the changes
+
+  Future<void> deletePatient(int id) async {
+    final DatabasePatient patient = _patients.firstWhere((element) => element.id == id);
+
+    //delete the patient
+    await _patientService.createDeleteTriggerAndDelete();
+    //actually delete the patient
+    await _patientService.deletePatientWithID(id);
+    _patients.remove(patient);
+    deletedPatients.add(patient);
+
     notifyListeners();
   }
 
@@ -75,9 +90,8 @@ class HospitalSystem extends ChangeNotifier {
   }
 
   Future<void> addNewDoctor(String name, String specialization) async {
-    final DatabaseDoctor newDoctor = DatabaseDoctor(id: _doctors.length + 1, name: name, specialization: specialization);
     await _tempDoctor.createDoctor(name: name, specialization: specialization);
-    _doctors.add(newDoctor);
+    //querry to get the last doctor
     notifyListeners();
   }
 
