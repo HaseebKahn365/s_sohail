@@ -19,8 +19,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:s_sohail/classes_and_vars/buisiness_logic_and_classes.dart';
-import 'package:s_sohail/main.dart';
-
 import 'package:s_sohail/services/hospital_services.dart';
 
 class PatientScreen extends ConsumerStatefulWidget {

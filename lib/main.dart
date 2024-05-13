@@ -162,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
   DatabaseDoctor d2 = DatabaseDoctor(name: 'Haseeb', specialization: 'General Surgeon', id: 2);
 
   //creating a selected Doctor
-  late DatabaseDoctor selectedDoctor;
+  DatabaseDoctor selectedDoctor = DatabaseDoctor(name: 'Dr. Sohail', specialization: 'General Physician', id: 1);
 
   //method to refresh the screen
 
