@@ -56,7 +56,7 @@ class HospitalSystem extends ChangeNotifier {
     notifyListeners();
   }
 
-  //deleting the patient with transactions so that we can revert the changes
+  //deleting the patient with triggers so that we can see the patient in the deleted patients list
 
   Future<void> deletePatient(int id) async {
     final DatabasePatient patient = _patients.firstWhere((element) => element.id == id);

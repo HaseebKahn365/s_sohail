@@ -118,11 +118,7 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
       ),
       body: ListView(
         children: [
-          //in the center
-          /*CircleAvatar(
-                                  radius: 30,
-                                  backgroundImage: AssetImage('assets/${(e.id % 5) + 1}.jpg'),
-                                ), */
+         
 
           Padding(
             padding: const EdgeInsets.all(15.0),

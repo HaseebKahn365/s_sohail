@@ -1,37 +1,3 @@
-//here we perform all the CRUD operations for the patient and visits
-/*
-Here is the structure of the database:
-CREATE TABLE `Patient` (
-	`id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	`name`	TEXT NOT NULL,
-	`admitted_on`	TEXT NOT NULL
-);
-
-CREATE TABLE `Visit` (
-	`id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	`amount`	INTEGER NOT NULL,
-	`diagnosis`	TEXT NOT NULL,
-	`user_id`	INTEGER NOT NULL,
-	`doc_id`	INTEGER NOT NULL,
-	`date`	TEXT NOT NULL,
-	FOREIGN KEY(`user_id`) REFERENCES `Patient`(`id`)
-);
-
-CREATE TABLE `Doctor` (
-	`id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	`name`	TEXT NOT NULL,
-	`specialization`	TEXT NOT NULL
-);
-
-//creating a similar table for deleted doctors
-CREATE TABLE `DeletedDoctor` (
-  `id`	INTEGER NOT NULL PRIMARY KEY,
-  `name`	TEXT NOT NULL,
-  `specialization`	TEXT NOT NULL
-);
-
-
- */
 
 import 'dart:developer';
 
@@ -114,6 +80,7 @@ class PatientService {
     }
 
     try {
+      //!copied from today's classwork
       await db.execute('''
       CREATE TRIGGER IF NOT EXISTS delete_patient_trigger
       AFTER DELETE ON $patientTable
