@@ -1,4 +1,3 @@
-
 import 'dart:developer';
 
 import 'package:path/path.dart';
@@ -37,7 +36,7 @@ class PatientService {
     final id = await db.insert(patientTable, {nameColumn: name, admittedOnColumn: admittedOn});
 
     final createdPatient = DatabasePatient(id: id, name: name, admittedOn: admittedOn);
-    print('created patient inside the db: $createdPatient');
+    log('created patient inside the db: $createdPatient');
     return createdPatient;
   }
 
@@ -101,7 +100,7 @@ class PatientService {
       return;
     }
     try {
-      print("Creating new database for patients");
+      log("Creating new database for patients");
       final docsPath = await getDatabasesPath();
       final dbPath = join(docsPath, dbName);
       _db = await openDatabase(dbPath, version: 1, onCreate: (db, version) async {
@@ -223,8 +222,8 @@ class DatabaseVisit {
   Future<void> updateVisit({required int id, required int amount, required String diagnosis, required int userId, required int docId, required String visitDate}) async {
     final db = _getDatabaseOrThrow();
     final updateCount = await db.update(visitTable, {amountColumn: amount, diagnosisColumn: diagnosis, userIdColumn: userId, docIdColumn: docId, visitDateColumn: visitDate}, where: '$idColumn = ?', whereArgs: [id]);
-    print('updated visit inside the db: $updateCount');
-    print('updated visit details: $id, $amount, $diagnosis, $userId, $docId, $visitDate');
+    log('updated visit inside the db: $updateCount');
+    log('updated visit details: $id, $amount, $diagnosis, $userId, $docId, $visitDate');
     if (updateCount != 1) {
       throw 'Error updating visit';
     }
@@ -242,7 +241,7 @@ class DatabaseVisit {
     final db = _getDatabaseOrThrow();
     final id = await db.insert(visitTable, {amountColumn: amount, diagnosisColumn: diagnosis, userIdColumn: userId, docIdColumn: docId, visitDateColumn: visitDate});
     final dbVisit = DatabaseVisit(id: id, amount: amount, diagnosis: diagnosis, userId: userId, docId: docId, visitDate: visitDate);
-    print('created visit inside the db: $dbVisit');
+    log('created visit inside the db: $dbVisit');
     return dbVisit;
   }
 
@@ -294,7 +293,7 @@ class DatabaseDoctor {
     final db = _getDatabaseOrThrow();
     //use aggregate function count()
     final results = await db.rawQuery('SELECT COUNT(*) FROM $doctorTable');
-    print('Number of doctors: ${results[0].values}');
+    log('Number of doctors: ${results[0].values}');
   }
 
   //create doctor

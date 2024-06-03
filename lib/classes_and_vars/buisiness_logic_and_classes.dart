@@ -7,6 +7,8 @@ We are going to have a central Hospital System class that will be used for manag
 
  */
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:s_sohail/services/hospital_services.dart';
 
@@ -29,14 +31,14 @@ class HospitalSystem extends ChangeNotifier {
 
   //initializing the database
   Future<void> initDatabase() async {
-    print("Trying to open the database and get the patients");
+    log("Trying to open the database and get the patients");
     await _patientService.open();
     _patients = await _patientService.getAllPatients();
-    print("Got the patients");
+    log("Got the patients");
     _visits = await _tempVisit.getAllVisits();
-    print("Got the visits");
+    log("Got the visits");
     _doctors = await _tempDoctor.getAllDoctors();
-    print("Got the doctors");
+    log("Got the doctors");
 
     deletedPatients = await _patientService.getDeletedPatients();
     notifyListeners();
